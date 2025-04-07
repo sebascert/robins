@@ -8,6 +8,8 @@ yacc_source := simplecalc.y
 yacc_product := y.tab.c
 yacc_headers := y.tab.h
 
+test_out := test_out.txt
+
 all: $(build_dir)/$(target)
 
 run: $(build_dir)/$(target)
@@ -16,9 +18,13 @@ run: $(build_dir)/$(target)
 
 clean:
 	@rm -rf $(build_dir)
+	@rm -rf $(test_out)
 	@rm -f $(lex_product) $(yacc_product) $(yacc_headers)
 
-.PHONY: all clean run
+test: $(build_dir)/$(target)
+	@./test.sh "$(build_dir)/$(target)" "$(test_out)"
+
+.PHONY: all clean run test
 
 $(build_dir)/$(target): $(lex_product) $(yacc_product) | $(build_dir)
 	gcc $(lex_product) $(yacc_product) -ly -ll -o $@
