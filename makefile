@@ -12,7 +12,13 @@ all: $(build_dir)/$(target)
 
 run: $(build_dir)/$(target)
 	@echo "./$(build_dir)/$(target)"
-	@./$(build_dir)/$(target) $(ARGS) || echo "exit with status code $$?"
+	@./$(build_dir)/$(target) || exit "$$?"
+
+clean:
+	@rm -rf $(build_dir)
+	@rm -f $(lex_product) $(yacc_product) $(yacc_headers)
+
+.PHONY: all clean run
 
 $(build_dir)/$(target): $(lex_product) $(yacc_product) | $(build_dir)
 	gcc $(lex_product) $(yacc_product) -ly -ll -o $@
@@ -25,9 +31,3 @@ $(yacc_product): $(yacc_source)
 
 $(build_dir):
 	@mkdir -p $(build_dir)
-
-clean:
-	@rm -rf $(build_dir)
-	@rm -f $(lex_product) $(yacc_product) $(yacc_headers)
-
-.PHONY: all clean
