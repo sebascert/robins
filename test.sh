@@ -11,6 +11,7 @@ test(){
     echo "$expr" | "./$build" > "$test_out"
     grep -q "$expected" "$test_out" ||
     echo "❌ Test failed! expected:$expected received:$(cat "$test_out")"
+    return 1
 }
 
 passed=1

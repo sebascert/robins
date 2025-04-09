@@ -1,39 +1,55 @@
-build_dir := build
 target := simplecalc
 
-lex_source := simplecalc.l
-lex_product := lex.yy.c
+libs = -ll -ly
+cflags = -Wall -Werror
 
-yacc_source := simplecalc.y
-yacc_product := y.tab.c
-yacc_headers := y.tab.h
+src_dir := src
+build_dir := build
+
+#compiled
+lex_c := $(src_dir)/lex.yy.c
+yacc_c := $(src_dir)/y.tab.c
+yacc_h := $(src_dir)/y.tab.h
+
+#sources
+lexer   := $(src_dir)/lexer.l
+parser  := $(src_dir)/parser.y
+sources = $(shell find $(src_dir) -name '*.c')
+sources := $(filter-out $(lex_c) $(yacc_c), $(sources))
+objs = $(sources:.c=.o)
 
 test_out := test_out.txt
 
-all: $(build_dir)/$(target)
+all: $(target)
 
-run: $(build_dir)/$(target)
+run: $(target)
 	@echo "./$(build_dir)/$(target)"
 	@./$(build_dir)/$(target) || exit "$$?"
+
+test: $(target)
+	@./test.sh "$(build_dir)/$(target)" "$(test_out)"
 
 clean:
 	@rm -rf $(build_dir)
 	@rm -rf $(test_out)
-	@rm -f $(lex_product) $(yacc_product) $(yacc_headers)
+	@rm -f $(lex_c) $(yacc_c) $(yacc_h)
+	@find . -name '*.o' -delete
 
-test: $(build_dir)/$(target)
-	@./test.sh "$(build_dir)/$(target)" "$(test_out)"
+$(target): $(build_dir)/$(target)
 
-.PHONY: all clean run test
+.PHONY: all clean run test $(target)
 
-$(build_dir)/$(target): $(lex_product) $(yacc_product) | $(build_dir)
-	gcc $(lex_product) $(yacc_product) -ly -ll -o $@
+$(build_dir)/$(target): $(objs) $(lex_c) $(yacc_c) | $(build_dir)
+	gcc $(lex_c) $(objs) $(yacc_c) $(libs) -o $@
 
-$(lex_product): $(yacc_product) $(lex_source)
-	lex $(lex_source)
+$(lex_c): $(lexer) $(yacc_h)
+	lex --outfile="$(lex_c)" $(lexer)
 
-$(yacc_product): $(yacc_source)
-	yacc -d $(yacc_source)
+$(yacc_c) $(yacc_h): $(parser)
+	yacc -d --output="$(yacc_c)" --header="$(yacc_h)" $(parser)
+
+%.o: %.c
+	gcc $(cflags) -c $< -o $@
 
 $(build_dir):
 	@mkdir -p $(build_dir)

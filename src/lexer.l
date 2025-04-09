@@ -4,7 +4,7 @@ extern int yylval;
 %}
 
 %%
-[0-9]+                      { yylval = atoi(yytext); return NUMBER; }
+[0-9]+                      { yylval = atoi(yytext);  return NUMBER; }
 [a-z]                       { yylval = yytext[0]; return NAME; }
 [ \t] ;                     /* ignore whitespace */
 . return yytext[0];         /* operator */

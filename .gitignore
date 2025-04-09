@@ -1,9 +1,13 @@
+build/
+
+# lex and yacc
 lex.yy.c
 *.tab.c
 *.tab.h
 *.tab.h.gch
 
-build/
-
+# c
+*.o
 *.out
+
 *.txt
