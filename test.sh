@@ -1,52 +1,80 @@
 #!/bin/bash
 
-build=$1
-test_out=$2
+set -euo pipefail
+trap 'echo "failed:$LINENO \"$BASH_COMMAND\""' ERR
+
+usage() {
+    echo "Usage: $0 <program> <tests_dir>"
+    echo
+    echo "Arguments:"
+    echo "  <program>     Path to the binary to test"
+    echo "  <tests_dir>   Directory containing test input/output files"
+    echo
+    echo "Returns: count of failed tests"
+    echo
+    echo "Each test consists of a directory test/ with:"
+    echo "  - optional args file containing command arguments"
+    echo "  - input file passed to the binary by path"
+    echo "  - expected file with the expected result"
+    echo "  - output.txt file the output of the last test execution"
+    echo
+    echo "Example:"
+    echo "  $0 ./build/bin tests/"
+}
+
+case "$1" in
+    -h|--help)
+        usage
+        exit 0
+        ;;
+esac
+
+if [ $# -ne 2 ]; then
+    usage
+    exit 1
+fi
+
+program="$1"
+tests_dir="$2"
 
 echo "Running test..."
 
-test(){
-    expr="$1"
-    expected="$2"
-    echo "$expr" | "./$build" > "$test_out"
-    grep -q "$expected" "$test_out" ||
-    echo "❌ Test failed! expected:$expected received:$(cat "$test_out")"
-    return 1
-}
-
-passed=1
-test "(1+2)+3" "= 6" || passed=0
-test "1+(2+3)" "= 6" || passed=0
-if [ $passed -eq 1 ]; then
-    echo "✅ associativity of addition passed!"
+if [ "$program" != ./\* ]; then
+    program="./$program"
 fi
 
-passed=1
-test "(2*3)*4" "= 24" || passed=0
-test "2*(3*4)" "= 24" || passed=0
-if [ $passed -eq 1 ]; then
-    echo "✅ associativity of multiplication passed!"
-fi
+failed=0
+for test in "$tests_dir"/*/; do
+    testname=$(basename "$test")
 
-passed=1
-test "2*(3+4)" "= 14" || passed=0
-test "2*3 + 2*4" "= 14" || passed=0
-if [ $passed -eq 1 ]; then
-    echo "✅ distributivity passed!"
-fi
+    test_args=$(cat "$test/args" 2>/dev/null || true)
+    test_input="$test/input"
+    test_expected="$test/expected"
+    test_output="$test/output.txt"
 
-passed=1
-test "1+2*3" "= 7" || passed=0
-test "2*3+1" "= 7" || passed=0
-if [ $passed -eq 1 ]; then
-    echo "✅ operator precedence passed!"
-fi
+    if [ ! -f "$test_input" ]; then
+        echo "Skipping $testname: missing input file"
+        continue
+    fi
 
-passed=1
-test "5+0" "= 5" || passed=0
-test "0+5" "= 5" || passed=0
-test "7*1" "= 7" || passed=0
-test "1*7" "= 7" || passed=0
-if [ $passed -eq 1 ]; then
-    echo "✅ identity elements passed!"
-fi
+    if [ ! -f "$test_expected" ]; then
+        echo "Skipping $testname: missing expected file"
+        continue
+    fi
+
+    echo -n "Test $testname: "
+
+    # execute program and discard control output
+    $program $test_args <"$test_input" >"$test_output" 2>/dev/null
+
+    if diff=$(diff "$test_expected" "$test_output"); then
+        echo "PASSED"
+    else
+        echo "FAILED"
+        echo "  DIFF:"
+        echo "$diff"
+        failed=$((failed+1))
+    fi
+done
+
+exit $failed

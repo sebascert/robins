@@ -5,6 +5,7 @@ cflags = -Wall -Werror
 
 src_dir := src
 build_dir := build
+tests_dir := tests
 
 #compiled
 lex_c := $(src_dir)/lex.yy.c
@@ -18,8 +19,6 @@ sources = $(shell find $(src_dir) -name '*.c')
 sources := $(filter-out $(lex_c) $(yacc_c), $(sources))
 objs = $(sources:.c=.o)
 
-test_out := test_out.txt
-
 all: $(target)
 
 run: $(target)
@@ -27,7 +26,7 @@ run: $(target)
 	@./$(build_dir)/$(target) || exit "$$?"
 
 test: $(target)
-	@./test.sh "$(build_dir)/$(target)" "$(test_out)"
+	@./test.sh "$(build_dir)/$(target)" "$(tests_dir)"
 
 clean:
 	@rm -rf $(build_dir)
