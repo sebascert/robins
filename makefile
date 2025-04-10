@@ -17,7 +17,7 @@ yacc_h      := $(src_dir)/y.tab.h
 #sources
 lexer       := $(src_dir)/lexer.l
 parser      := $(src_dir)/parser.y
-sources := $(filter-out $(lex_c) $(yacc_c), \
+sources     := $(filter-out $(lex_c) $(yacc_c), \
                     $(shell find $(src_dir) -name '*.c'))
 objs = $(sources:.c=.o)
 
@@ -47,7 +47,7 @@ $(lex_c): $(lexer) $(yacc_h)
 	lex $(lexflags) --outfile="$(lex_c)" $(lexer)
 
 $(yacc_c) $(yacc_h): $(parser)
-	yacc $(yaccflags) -d --output="$(yacc_c)" --header="$(yacc_h)" $(parser)
+	yacc $(yaccflags) --output="$(yacc_c)" --header="$(yacc_h)" $(parser)
 
 %.o: %.c
 	gcc $(cflags) -c $< -o $@
