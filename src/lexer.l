@@ -1,5 +1,6 @@
 %{
 #include <stdlib.h>
+#include "parser.h"
 #include "y.tab.h"
 %}
 
@@ -11,23 +12,21 @@ _alphanum   [_A-Za-z0-9]
 
 %%
     /* keywords */
-i                       { return INT; }
-f                       { return FLOAT; }
-p                       { return PRINT; }
+i                               { return INT; }
+f                               { return FLOAT; }
+p                               { return PRINT; }
     /* operators */
-\+                      { return *yytext; }
--                       { return *yytext; }
-\*                      { return *yytext; }
-\/                      { return *yytext; }
+[-+*/()=]                       { return *yytext; }
     /* literals */
--?{num}+                  { yylval = atoi(yytext);  return INT_L; }
--?\.{num}+                { yylval = strtof(yytext, NULL);  return FLOAT_L; }
--?{num}+\.{num}*          { yylval = strtof(yytext, NULL);  return FLOAT_L; }
+-?{num}+                        { yylval.vval.ival = atoi(yytext);  return INT_L; }
+-?(\.{num}+|{num}+\.{num}*)     { yylval.vval.fval = strtof(yytext, NULL);  return FLOAT_L; }
     /* identifiers */
-{_alpha}{_alphanum}*  { yylval = yytext; return IDENTIFIER; }
+{_alpha}{_alphanum}*            { yylval.id = yytext; return VAR; }
     /* ignores */
-\/\/.*                  ; /* ignore comments */
-[ \t]                   ; /* ignore whitespace */
-    /* keywords */
-\n                      { return *yytext; }
+\/\/.*                          ; /* ignore comments */
+[ \t]                           ; /* ignore whitespace */
+    /* statement terminator */
+\n                              { return *yytext; }
+    /* lexical error */
+.                               { yyerror("invalid token"); }
 %%
