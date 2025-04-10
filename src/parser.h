@@ -23,13 +23,13 @@ typedef enum {
 } node_type;
 
 struct id_node {
-    const char *id;
+    char *id;
 };
 
 struct op_node {
     int op;
     int n_operands;
-    struct ast_node *operands;
+    struct ast_node **operands;
 };
 
 struct cst_node {
@@ -38,7 +38,7 @@ struct cst_node {
 };
 
 struct ast_node {
-    node_type var_type;
+    node_type type;
     union {
         struct id_node id;
         struct op_node op;
