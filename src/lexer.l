@@ -1,12 +1,33 @@
 %{
+#include <stdlib.h>
 #include "y.tab.h"
-extern int yylval;
 %}
 
+num         [0-9]
+alpha       [A-Za-z]
+alphanum    [A-Za-z0-9]
+_alpha      [_A-Za-z]
+_alphanum   [_A-Za-z0-9]
+
 %%
-[0-9]+                      { yylval = atoi(yytext);  return NUMBER; }
-[a-z]                       { yylval = yytext[0]; return NAME; }
-[ \t] ;                     /* ignore whitespace */
-. return yytext[0];         /* operator */
-\n return 0;                /* logical EOF */
+    /* keywords */
+i                       { return INT; }
+f                       { return FLOAT; }
+p                       { return PRINT; }
+    /* operators */
+\+                      { return *yytext; }
+-                       { return *yytext; }
+\*                      { return *yytext; }
+\/                      { return *yytext; }
+    /* literals */
+-?{num}+                  { yylval = atoi(yytext);  return INT_L; }
+-?\.{num}+                { yylval = strtof(yytext, NULL);  return FLOAT_L; }
+-?{num}+\.{num}*          { yylval = strtof(yytext, NULL);  return FLOAT_L; }
+    /* identifiers */
+{_alpha}{_alphanum}*  { yylval = yytext; return IDENTIFIER; }
+    /* ignores */
+\/\/.*                  ; /* ignore comments */
+[ \t]                   ; /* ignore whitespace */
+    /* keywords */
+\n                      { return *yytext; }
 %%
