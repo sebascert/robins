@@ -1,22 +1,24 @@
 target := simplecalc
 
-libs = -ll -ly
-cflags = -Wall -Werror
+clibs       := -ll -ly
+cflags      := -Wall -Werror
+lexflags    ?=
+yaccflags   ?=
 
-src_dir := src
-build_dir := build
-tests_dir := tests
+src_dir     := src
+build_dir   := build
+tests_dir   := tests
 
 #compiled
-lex_c := $(src_dir)/lex.yy.c
-yacc_c := $(src_dir)/y.tab.c
-yacc_h := $(src_dir)/y.tab.h
+lex_c       := $(src_dir)/lex.yy.c
+yacc_c      := $(src_dir)/y.tab.c
+yacc_h      := $(src_dir)/y.tab.h
 
 #sources
-lexer   := $(src_dir)/lexer.l
-parser  := $(src_dir)/parser.y
-sources = $(shell find $(src_dir) -name '*.c')
-sources := $(filter-out $(lex_c) $(yacc_c), $(sources))
+lexer       := $(src_dir)/lexer.l
+parser      := $(src_dir)/parser.y
+sources := $(filter-out $(lex_c) $(yacc_c), \
+                    $(shell find $(src_dir) -name '*.c'))
 objs = $(sources:.c=.o)
 
 all: $(target)
@@ -39,13 +41,13 @@ $(target): $(build_dir)/$(target)
 .PHONY: all clean run test $(target)
 
 $(build_dir)/$(target): $(objs) $(lex_c) $(yacc_c) | $(build_dir)
-	gcc $(lex_c) $(objs) $(yacc_c) $(libs) -o $@
+	gcc $(lex_c) $(objs) $(yacc_c) $(clibs) -o $@
 
 $(lex_c): $(lexer) $(yacc_h)
-	lex --outfile="$(lex_c)" $(lexer)
+	lex $(lexflags) --outfile="$(lex_c)" $(lexer)
 
 $(yacc_c) $(yacc_h): $(parser)
-	yacc -d --output="$(yacc_c)" --header="$(yacc_h)" $(parser)
+	yacc $(yaccflags) -d --output="$(yacc_c)" --header="$(yacc_h)" $(parser)
 
 %.o: %.c
 	gcc $(cflags) -c $< -o $@
