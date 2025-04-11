@@ -2,7 +2,7 @@ target := simplecalc
 
 #cflags
 clibs       := -lfl -ly
-cflags      := -Wall -Werror
+cflags      := -Wall -Werror -g
 lexyacc_cflags :=
 
 #dirs
@@ -10,20 +10,20 @@ src_dir     := src
 build_dir   := build
 tests_dir   := tests
 
-#sources
-lexer       := $(src_dir)/lexer.l
-parser      := $(src_dir)/parser.y
-sources     := $(filter-out $(lex_c) $(yacc_c), $(shell find $(src_dir) -name '*.c'))
-
 #lexyacc
 lex_c       := $(src_dir)/lex.yy.c
 yacc_c      := $(src_dir)/y.tab.c
 yacc_h      := $(src_dir)/y.tab.h
-lexyacc_sources := $(lex_c) $(yacc_c) $(yacc_h)
+lexyacc_sources := $(lex_c) $(yacc_c)
+
+#sources
+lexer       := $(src_dir)/lexer.l
+parser      := $(src_dir)/parser.y
+sources     := $(filter-out $(lexyacc_sources), $(shell find $(src_dir) -name '*.c'))
 
 # objects
 objs        := $(sources:.c=.o)
-lexyacc_objs   := $(lex_c:.c=.o) $(yacc_c:.c=.o)
+lexyacc_objs   := $(lexyacc_sources:.c=.o)
 
 #lexyacc flags
 lexflags    ?=
@@ -39,22 +39,19 @@ test: $(target)
 	@./test.sh "$(build_dir)/$(target)" "$(tests_dir)"
 
 clean:
-	@rm -f $(lexyacc_sources)
+	@rm -f $(lexyacc_sources) $(yacc_h)
 	@rm -f $(build_dir)/$(target)
 	@find . -name '*.o' -delete
 
 clean-all:
 	@rm -rf $(build_dir)
 
-#temp fix for compilation errors
-$(target):
-	@$(MAKE) --no-print-dir clean
-	@$(MAKE) --no-print-dir $(build_dir)/$(target)
+$(target): $(build_dir)/$(target)
 
 .PHONY: all clean run test $(target)
 
-$(build_dir)/$(target): $(lexyacc_objs) $(objs) | $(build_dir)
-	gcc $(clibs) $(objs) $(lexyacc_objs) -o $@
+$(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
+	gcc $(cflags) $(clibs) $(objs) $(lexyacc_objs) -o $@
 
 $(lex_c): $(lexer) $(yacc_h)
 	lex $(lexflags) --outfile="$(lex_c)" -- $(lexer)
