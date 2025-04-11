@@ -1,6 +1,8 @@
 #ifndef VAR_H
 #define VAR_H
 
+#include <stdio.h>
+
 extern const char *const vtype_names[];
 typedef enum {
     VTYPE_NULL = -1,
@@ -18,9 +20,13 @@ struct var {
     union var_val val;
 };
 
-static struct var NULL_VAR = {
-    .type = VTYPE_NULL,
-    .val = {0},
-};
+extern struct var NULL_VAR;
+int print_var(struct var var, FILE *fout);
+
+struct var var_negate(struct var a);
+struct var var_add(struct var a, struct var b);
+struct var var_sub(struct var a, struct var b);
+struct var var_mul(struct var a, struct var b);
+struct var var_div(struct var a, struct var b);
 
 #endif /* ifndef VAR_H */
