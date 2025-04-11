@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "interpret.h"
-#include "parser.h"
+#include "parse.h"
 
 ast_evaluator eval_ast;
 

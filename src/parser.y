@@ -1,7 +1,7 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
-#include "parser.h"
+#include "parse.h"
 #include "interpret.h"
 
 int yylex();

@@ -1,7 +1,5 @@
 #include "interpret.h"
 
-#include "parser.h"
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>

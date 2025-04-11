@@ -1,6 +1,6 @@
 %{
 #include <stdlib.h>
-#include "parser.h"
+#include "parse.h"
 #include "y.tab.h"
 %}
 

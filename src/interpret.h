@@ -1,7 +1,7 @@
 #ifndef INTERPRET_H
 #define INTERPRET_H
 
-#include "parser.h"
+#include "parse.h"
 
 #include <stdbool.h>
 #include <stdio.h>
