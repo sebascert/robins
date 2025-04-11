@@ -9,7 +9,7 @@
 #define MAX_VAR_ENTRIES 26
 
 void initialize_interpreter(void);
-void execute(struct ast_node *node);
+void execute(const struct ast_node *node);
 
 void sserror(bool terminate, const char *s, ...);
 

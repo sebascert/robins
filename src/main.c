@@ -1,8 +1,18 @@
 #include <stdio.h>
 
+#include "interpret.h"
+#include "parser.h"
+
+ast_evaluator eval_ast;
+
 int yyparse(void);
 
 int main(void) {
     fprintf(stderr, "simple calc program\n");
-    return yyparse();
+
+    eval_ast = execute;
+
+    int yycode = yyparse();
+
+    return yycode;
 }

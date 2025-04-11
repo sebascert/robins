@@ -32,8 +32,8 @@ int yylex();
 program:
     /* epsilon */               { exit(0); }
 |   '\n' program
-|   declaration '\n' program    { execute($1); free_node($1); }
-|   statement '\n' program      { execute($1); free_node($1); }
+|   declaration '\n' program    { eval_ast($1); free_node($1); }
+|   statement '\n' program      { eval_ast($1); free_node($1); }
 |   error '\n'
 ;
 

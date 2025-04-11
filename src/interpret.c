@@ -28,7 +28,7 @@ bool valid_id(const char *id);
 bool compatible_types(var_type dest, var_type orig);
 union var_val default_var_val(var_type type);
 
-void execute(struct ast_node *node) {}
+void execute(const struct ast_node *node) {}
 
 void initialize_interpreter(void) {
     for (size_t i = 0; i < MAX_VAR_ENTRIES; i++) {
