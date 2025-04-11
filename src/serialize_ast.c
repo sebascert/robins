@@ -78,13 +78,13 @@ int serialize_ast_nodes(const struct ast_node *node, FILE *fout) {
 
     case NTYPE_CONST:
         fprintf(fout, "_cst%lu [label=\"", node_id);
-        switch (node->cst.type) {
+        switch (node->cst.v.type) {
         case VTYPE_INT:
-            fprintf(fout, "%d", node->cst.val.ival);
+            fprintf(fout, "%d", node->cst.v.val.ival);
             break;
 
         case VTYPE_FLOAT:
-            fprintf(fout, "%f", node->cst.val.fval);
+            fprintf(fout, "%f", node->cst.v.val.fval);
             break;
 
         default:

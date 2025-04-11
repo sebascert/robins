@@ -52,7 +52,7 @@ struct ast_node *push_id(const char *id) {
     return node;
 }
 
-struct ast_node *push_op(int op, int n_operands, ...) {
+struct ast_node *push_op(int op, size_t n_operands, ...) {
     struct ast_node *node = malloc(sizeof(struct ast_node));
     if (!node) {
         yyerror("unable to allocate memory for AST nodes");
@@ -87,8 +87,8 @@ struct ast_node *push_const(var_type type, union var_val val) {
         return NULL;
     }
 
-    node->cst.type = type;
-    node->cst.val = val;
+    node->cst.v.type = type;
+    node->cst.v.val = val;
 
     node->type = NTYPE_CONST;
     return node;

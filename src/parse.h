@@ -1,19 +1,10 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-// variable types
-extern const char *const vtype_names[];
-typedef enum {
-    VTYPE_INT,
-    VTYPE_FLOAT,
-} var_type;
+#include <stddef.h>
 
-union var_val {
-    int ival;
-    float fval;
-};
+#include "var.h"
 
-// AST nodes
 struct ast_node;
 
 typedef void (*ast_evaluator)(const struct ast_node *);
@@ -31,13 +22,12 @@ struct id_node {
 
 struct op_node {
     int op;
-    int n_operands;
+    size_t n_operands;
     struct ast_node **operands;
 };
 
 struct cst_node {
-    var_type type;
-    union var_val val;
+    struct var v;
 };
 
 struct ast_node {
@@ -52,7 +42,7 @@ struct ast_node {
 void free_node(struct ast_node *node);
 
 struct ast_node *push_id(const char *id);
-struct ast_node *push_op(int op, int n_operands, ...);
+struct ast_node *push_op(int op, size_t n_operands, ...);
 struct ast_node *push_const(var_type type, union var_val val);
 
 void yyerror(const char *s);
