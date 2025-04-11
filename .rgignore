@@ -6,6 +6,10 @@ lex.yy.c
 *.tab.h
 *.tab.h.gch
 
+# graphviz
+*.dot
+*.png
+
 # c
 *.o
 *.out

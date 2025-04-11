@@ -10,4 +10,8 @@ lex.yy.c
 *.o
 *.out
 
+# graphviz
+*.dot
+*.png
+
 *.txt
