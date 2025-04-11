@@ -3,14 +3,19 @@
 #include "interpret.h"
 #include "parse.h"
 
-ast_evaluator eval_ast;
+static FILE *fout;
+
+ast_evaluator eval_ast_statement;
+void out_graph(const struct ast_node *ast) { serialize_ast(ast, fout); }
+void interpret(const struct ast_node *ast) { interpret_ast(ast, fout); }
 
 int yyparse(void);
 
-int main(void) {
+int main(int arc, char **argv) {
     fprintf(stderr, "simple calc program\n");
 
-    eval_ast = execute;
+    fout = stdout;
+    eval_ast_statement = interpret;
 
     int yycode = yyparse();
 

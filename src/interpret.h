@@ -14,7 +14,8 @@ void initialize_interpreter(void);
 // serialize ast into graphviz representation
 void serialize_ast(const struct ast_node *ast, FILE *fout);
 
-void execute(const struct ast_node *node);
+// interpret abstract syntax tree
+void interpret_ast(const struct ast_node *ast, FILE *fout);
 
 void sserror(bool terminate, const char *s, ...);
 
