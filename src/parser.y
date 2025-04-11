@@ -25,27 +25,32 @@ int yylex();
 %token <id> VAR
 /* types */
 %type <type> type
-%type <nptr> declaration statement
-%type <nptr> expression term factor num_const
+%type <nptr> id num_const
+%type <nptr> primary_statement statement declaration
+%type <nptr> expression term factor
 
 %%
 program:
     /* epsilon */               { exit(0); }
 |   '\n' program
-|   declaration '\n' program    { eval_ast($1); free_node($1); }
-|   statement '\n' program      { eval_ast($1); free_node($1); }
+|   primary_statement '\n' program
 |   error '\n'
 ;
 
+primary_statement:
+    statement                   { eval_ast_statement($1); free_node($1); }
+|   declaration                 { eval_ast_statement($1); free_node($1); }
+;
+
 declaration:
-    type VAR                    { $$ = push_op($1, 1, $2); }
-|   type VAR '=' expression     { $$ = push_op($1, 2, $2, $4); }
+    type id                     { $$ = push_op($1, 1, $2); }
+|   type id '=' expression      { $$ = push_op($1, 2, $2, $4); }
 ;
 
 statement:
     expression                  { $$ = $1; }
-|   PRINT expression '\n'       { $$ = push_op('p', 1, $2); }
-|   VAR '=' expression '\n'     { $$ = push_op('-', 2, $1, $3); }
+|   PRINT expression            { $$ = push_op('p', 1, $2); }
+|   id '=' expression           { $$ = push_op('=', 2, $1, $3); }
 ;
 
 expression:
@@ -60,9 +65,13 @@ term:
 |   factor '/' term             { $$ = push_op('/', 2, $1, $3); }
 ;
 factor:
-    VAR                         { $$ = push_id($1); }
+    id                          { $$ = $1; }
 |   num_const                   { $$ = $1; }
 |   '(' expression ')'          { $$ = $2; }
+;
+
+id:
+    VAR                         { $$ = push_id($1); }
 ;
 
 num_const:

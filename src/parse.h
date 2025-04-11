@@ -17,7 +17,7 @@ union var_val {
 struct ast_node;
 
 typedef void (*ast_evaluator)(const struct ast_node *);
-extern ast_evaluator eval_ast;
+extern ast_evaluator eval_ast_statement;
 
 typedef enum {
     NTYPE_ID,

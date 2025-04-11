@@ -50,7 +50,7 @@ int decl_var(const char *id, union var_val val) {
     }
 
     if (!free_entry) {
-        sserror(false, "decl_var: max variables stored reached");
+        sserror(false, "decl_var: max variables stored reached\n");
         return 1;
     }
 
@@ -74,7 +74,7 @@ int decl_or_set_var(const char *id, var_type type, union var_val val) {
     }
 
     if (!free_entry) {
-        sserror(false, "decl_or_set_var: max variables stored reached");
+        sserror(false, "decl_or_set_var: max variables stored reached\n");
         return 1;
     }
 
@@ -153,7 +153,8 @@ union var_val default_var_val(var_type type) {
         return (union var_val)0;
 
     default:
-        sserror(true, "default_var_val: unknown type '%s' has no default value",
+        sserror(true,
+                "default_var_val: unknown type '%s' has no default value\n",
                 vtype_names[type]);
         return (union var_val)0;
     }
@@ -171,12 +172,14 @@ const char *serialize_op(int operand) {
         return "/";
     case '=':
         return "=";
+    case 'p':
+        return "print";
     case VTYPE_INT:
         return "int";
     case VTYPE_FLOAT:
         return "float";
     default:
-        sserror(true, "operand_to_str: invalid opeand");
+        sserror(true, "operand_to_str: invalid operand\n");
         return NULL;
     }
 }
@@ -208,7 +211,7 @@ int serialize_ast_nodes(const struct ast_node *node, FILE *fout) {
         break;
 
     default:
-        sserror(true, "serialize_ast_nodes: invalid node type");
+        sserror(true, "serialize_ast_nodes: invalid node type\n");
         return -1;
     }
 
@@ -223,7 +226,8 @@ int serialize_ast_nodes(const struct ast_node *node, FILE *fout) {
             struct ast_node *operand = node->op.operands[i];
             int operand_node_id = serialize_ast_nodes(operand, fout);
             if (operand_node_id == -1) {
-                sserror(false, "serialize_ast_nodes: null operand in op_node");
+                sserror(false,
+                        "serialize_ast_nodes: null operand in op_node\n");
                 continue;
             }
             fprintf(fout, "_op%lu -> _%s%lu\n", node_id,
@@ -243,14 +247,14 @@ int serialize_ast_nodes(const struct ast_node *node, FILE *fout) {
             break;
 
         default:
-            sserror(true, "serialize_ast_nodes: invalid cst_node vtype");
+            sserror(true, "serialize_ast_nodes: invalid cst_node vtype\n");
             return -1;
         }
         fprintf(fout, "\"]\n");
         return node_id;
 
     default:
-        sserror(true, "serialize_ast_nodes: invalid node type");
+        sserror(true, "serialize_ast_nodes: invalid node type\n");
         return -1;
     }
 
