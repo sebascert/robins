@@ -1,25 +1,33 @@
 target := simplecalc
 
-clibs       := -ll -ly
+#cflags
+clibs       := -lfl -ly
 cflags      := -Wall -Werror
-lexflags    ?=
-yaccflags   ?=
+lexyacc_cflags :=
 
+#dirs
 src_dir     := src
 build_dir   := build
 tests_dir   := tests
 
-#compiled
-lex_c       := $(src_dir)/lex.yy.c
-yacc_c      := $(src_dir)/y.tab.c
-yacc_h      := $(src_dir)/y.tab.h
-
 #sources
 lexer       := $(src_dir)/lexer.l
 parser      := $(src_dir)/parser.y
-sources     := $(filter-out $(lex_c) $(yacc_c), \
-                    $(shell find $(src_dir) -name '*.c'))
-objs = $(sources:.c=.o)
+sources     := $(filter-out $(lex_c) $(yacc_c), $(shell find $(src_dir) -name '*.c'))
+
+#lexyacc
+lex_c       := $(src_dir)/lex.yy.c
+yacc_c      := $(src_dir)/y.tab.c
+yacc_h      := $(src_dir)/y.tab.h
+lexyacc_sources := $(lex_c) $(yacc_c) $(yacc_h)
+
+# objects
+objs        := $(sources:.c=.o)
+lexyacc_objs   := $(lex_c:.c=.o) $(yacc_c:.c=.o)
+
+#lexyacc flags
+lexflags    ?=
+yaccflags   ?=
 
 all: $(target)
 
@@ -31,26 +39,35 @@ test: $(target)
 	@./test.sh "$(build_dir)/$(target)" "$(tests_dir)"
 
 clean:
-	@rm -rf $(build_dir)
-	@rm -rf $(test_out)
-	@rm -f $(lex_c) $(yacc_c) $(yacc_h)
+	@rm -f $(lexyacc_sources)
+	@rm -f $(build_dir)/$(target)
 	@find . -name '*.o' -delete
 
-$(target): $(build_dir)/$(target)
+clean-all:
+	@rm -rf $(build_dir)
+
+#temp fix for compilation errors
+$(target):
+	@$(MAKE) --no-print-dir clean
+	@$(MAKE) --no-print-dir $(build_dir)/$(target)
 
 .PHONY: all clean run test $(target)
 
-$(build_dir)/$(target): $(objs) $(lex_c) $(yacc_c) | $(build_dir)
-	gcc $(lex_c) $(objs) $(yacc_c) $(clibs) -o $@
+$(build_dir)/$(target): $(lexyacc_objs) $(objs) | $(build_dir)
+	gcc $(clibs) $(objs) $(lexyacc_objs) -o $@
 
 $(lex_c): $(lexer) $(yacc_h)
-	lex $(lexflags) --outfile="$(lex_c)" $(lexer)
+	lex $(lexflags) --outfile="$(lex_c)" -- $(lexer)
 
 $(yacc_c) $(yacc_h): $(parser)
-	yacc $(yaccflags) --output="$(yacc_c)" --header="$(yacc_h)" $(parser)
+	bison $(yaccflags) --output="$(yacc_c)" --header="$(yacc_h)" -- $(parser)
 
 %.o: %.c
 	gcc $(cflags) -c $< -o $@
+
+$(lexyacc_objs): $(lex_c) $(yacc_c)
+$(lexyacc_objs): %.o: %.c
+	gcc $(lexyacc_cflags) -c $< -o $@
 
 $(build_dir):
 	@mkdir -p $(build_dir)
