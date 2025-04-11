@@ -1,15 +1,18 @@
 #include "interpret.h"
+#include "parse.h"
+#include "var.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+// var entry
 struct var_entry {
     char id[VAR_ID_SIZE];
-    var_type type;
-    union var_val val;
+    struct var v;
 };
+
 struct var_entry variables[MAX_VAR_ENTRIES];
 
 const char *const vtype_names[] = {
@@ -18,11 +21,11 @@ const char *const vtype_names[] = {
 };
 
 // utils
-int decl_var(const char *id, var_type type, union var_val val);
-int decl_or_set_var(const char *id, var_type type, union var_val val);
+int decl_var(const char *id, struct var var);
+int decl_or_set_var(const char *id, struct var var);
 
 struct var_entry *get_var(const char *id);
-int set_var(const char *id, var_type type, union var_val val);
+int set_var(const char *id, struct var var);
 
 bool valid_id(const char *id);
 bool compatible_types(var_type dest, var_type orig);
@@ -35,9 +38,120 @@ void initialize_interpreter(void) {
     }
 }
 
-void interpret_ast_node(const struct ast_node *node, FILE *fout) {
-    if (!node) {
-        return;
+struct var interpret_ast_node(const struct ast_node *node, FILE *fout);
+
+struct var op_unary_arithmetic(const struct op_node *node, FILE *fout) {
+    struct var a;
+    a = interpret_ast_node(node->operands[0], fout);
+    switch (node->op) {
+    case '-':
+        return var_negate(a);
+    default:
+        return NULL_VAR;
+    }
+}
+struct var op_bin_arithmetic(const struct op_node *node, FILE *fout) {
+    struct var a, b;
+    a = interpret_ast_node(node->operands[0], fout);
+    b = interpret_ast_node(node->operands[1], fout);
+
+    switch (node->op) {
+    case '-':
+        return var_sub(a, b);
+    case '+':
+        return var_add(a, b);
+    case '*':
+        return var_mul(a, b);
+    case '/':
+        return var_div(a, b);
+    default:
+        return NULL_VAR;
+    }
+}
+
+void op_assignment(const struct op_node *node, FILE *fout) {
+    struct var var = interpret_ast_node(node->operands[1], fout);
+
+    decl_or_set_var(node->operands[0]->id.id, var);
+}
+
+void op_decl(const struct op_node *node, FILE *fout) {
+    struct var var;
+    var.type = node->op;
+
+    if (node->n_operands == 1)
+        var.val = default_var_val(var.type);
+    else
+        var.val = interpret_ast_node(node->operands[1], fout).val;
+
+    decl_var(node->operands[0]->id.id, var);
+}
+
+struct var interpret_ast_node(const struct ast_node *node, FILE *fout) {
+    if (!node)
+        return NULL_VAR;
+
+    switch (node->type) {
+    case NTYPE_ID:
+        return get_var(node->id.id)->v;
+    case NTYPE_CONST:
+        return node->cst.v;
+    case NTYPE_OP:
+        switch (node->op.op) {
+        case '-':
+            if (node->op.n_operands == 1) {
+                goto unary;
+            }
+        case '+':
+        case '*':
+        case '/':
+            if (node->op.n_operands != 2) {
+                sserror(
+                    false,
+                    "interpret_ast_node: binary arithmetic expects 2 operands");
+                return NULL_VAR;
+            }
+            return op_bin_arithmetic(&node->op, fout);
+        unary:
+            return op_unary_arithmetic(&node->op, fout);
+
+        case '=':
+            if (node->op.n_operands != 2) {
+                sserror(false,
+                        "interpret_ast_node: assignment expects 2 operands");
+                return NULL_VAR;
+            }
+            op_assignment(&node->op, fout);
+            return NULL_VAR;
+
+        /* print */
+        case 'p':
+            if (node->op.n_operands != 1) {
+                sserror(false, "interpret_ast_node: print expects 1 operand");
+                return NULL_VAR;
+            }
+            fprintf(fout, "print ");
+            print_var(interpret_ast_node(node->op.operands[0], fout), fout);
+            fprintf(fout, "\n");
+            return NULL_VAR;
+
+        /* declarations */
+        case VTYPE_INT:
+        case VTYPE_FLOAT:
+            if (node->op.n_operands > 2) {
+                sserror(false,
+                        "interpret_ast_node: decl expects at most 2 operands");
+                return NULL_VAR;
+            }
+            op_decl(&node->op, fout);
+            return NULL_VAR;
+        default:
+            sserror(true, "interpret_ast_node: invalid operand\n");
+            return NULL_VAR;
+        }
+    default:
+        sserror(true, "interpret_ast_node: invalid node type\n");
+        return NULL_VAR;
     }
 }
 
@@ -47,101 +161,17 @@ void interpret_ast(const struct ast_node *ast, FILE *fout) {
         return;
     }
 
-    interpret_ast_node(ast, fout);
+    struct var result = interpret_ast_node(ast, fout);
+    if (result.type == VTYPE_NULL ||
+        (ast->type == NTYPE_OP && ast->op.op == 'p'))
+        return;
+
+    fprintf(fout, "= ");
+    print_var(result, fout);
+    fprintf(fout, "\n");
 }
 
-static int serialized_ntype_count[] = {
-    [NTYPE_ID] = 0,
-    [NTYPE_OP] = 0,
-    [NTYPE_CONST] = 0,
-};
-
-int serialize_ast_nodes(const struct ast_node *node, FILE *fout) {
-    if (!node)
-        return -1;
-    static const char *ntype_strid[] = {
-        [NTYPE_ID] = "id",
-        [NTYPE_OP] = "op",
-        [NTYPE_CONST] = "cst",
-    };
-
-    const char *label;
-    int type = node->type;
-    size_t node_id;
-
-    switch (type) {
-    case NTYPE_ID:
-    case NTYPE_OP:
-    case NTYPE_CONST:
-        node_id = serialized_ntype_count[type]++;
-        break;
-
-    default:
-        sserror(true, "serialize_ast_nodes: invalid node type\n");
-        return -1;
-    }
-
-    switch (type) {
-    case NTYPE_ID:
-        label = node->id.id;
-        break;
-
-    case NTYPE_OP:
-        label = serialize_op(node->op.op);
-        for (size_t i = 0; i < node->op.n_operands; i++) {
-            struct ast_node *operand = node->op.operands[i];
-            int operand_node_id = serialize_ast_nodes(operand, fout);
-            if (operand_node_id == -1) {
-                sserror(false,
-                        "serialize_ast_nodes: null operand in op_node\n");
-                continue;
-            }
-            fprintf(fout, "_op%lu -> _%s%lu\n", node_id,
-                    ntype_strid[operand->type], (size_t)operand_node_id);
-        }
-        break;
-
-    case NTYPE_CONST:
-        fprintf(fout, "_cst%lu [label=\"", node_id);
-        switch (node->cst.type) {
-        case VTYPE_INT:
-            fprintf(fout, "%d", node->cst.val.ival);
-            break;
-
-        case VTYPE_FLOAT:
-            fprintf(fout, "%f", node->cst.val.fval);
-            break;
-
-        default:
-            sserror(true, "serialize_ast_nodes: invalid cst_node vtype\n");
-            return -1;
-        }
-        fprintf(fout, "\"]\n");
-        return node_id;
-
-    default:
-        sserror(true, "serialize_ast_nodes: invalid node type\n");
-        return -1;
-    }
-
-    fprintf(fout, "_%s%lu [label=\"%s\"]\n", ntype_strid[type], node_id, label);
-    return node_id;
-}
-
-void serialize_ast(const struct ast_node *ast, FILE *fout) {
-    for (size_t i = 0; i < (sizeof(serialized_ntype_count) / sizeof(int));
-         i++) {
-        serialized_ntype_count[i] = 0;
-    }
-
-    fprintf(fout, "digraph Tree {\n");
-
-    serialize_ast_nodes(ast, fout);
-
-    fprintf(fout, "}\n");
-}
-
-int decl_var(const char *id, var_type type, union var_val val) {
+int decl_var(const char *id, struct var var) {
     if (!valid_id(id))
         return 1;
 
@@ -162,19 +192,18 @@ int decl_var(const char *id, var_type type, union var_val val) {
     }
 
     snprintf(free_entry->id, VAR_ID_SIZE, "%s", id);
-    free_entry->val = val;
-    free_entry->type = type;
+    free_entry->v = var;
     return 0;
 }
 
-int decl_or_set_var(const char *id, var_type type, union var_val val) {
+int decl_or_set_var(const char *id, struct var var) {
     if (!valid_id(id))
         return 1;
 
     struct var_entry *free_entry = NULL;
     for (size_t i = 0; i < MAX_VAR_ENTRIES; i++) {
         if (strcmp(variables[i].id, id) == 0)
-            return set_var(id, type, val);
+            return set_var(id, var);
 
         if (!free_entry && *variables[i].id == '\0')
             free_entry = &variables[i];
@@ -186,8 +215,7 @@ int decl_or_set_var(const char *id, var_type type, union var_val val) {
     }
 
     snprintf(free_entry->id, VAR_ID_SIZE, "%s", id);
-    free_entry->val = val;
-    free_entry->type = type;
+    free_entry->v = var;
     return 0;
 }
 
@@ -203,19 +231,19 @@ struct var_entry *get_var(const char *id) {
     return NULL;
 }
 
-int set_var(const char *id, var_type type, union var_val val) {
-    struct var_entry *var;
+int set_var(const char *id, struct var var) {
+    struct var_entry *entry;
 
-    if (!(var = get_var(id)))
+    if (!(entry = get_var(id)))
         return 1;
 
-    if (compatible_types(var->type, type)) {
-        var->val = val;
+    if (compatible_types(entry->v.type, var.type)) {
+        entry->v.val = var.val;
         return 0;
     }
 
     sserror(false, "set_var: assigning %s to variable of type %s\n",
-            variables[type], variables[var->type]);
+            vtype_names[var.type], vtype_names[entry->v.type]);
     return 1;
 }
 
@@ -254,10 +282,10 @@ bool compatible_types(var_type dest, var_type orig) {
 union var_val default_var_val(var_type type) {
     switch (type) {
     case VTYPE_INT:
-        return (union var_val)0;
+        return (union var_val){.ival = 0};
 
     case VTYPE_FLOAT:
-        return (union var_val)0;
+        return (union var_val){.fval = 0.0f};
 
     default:
         sserror(true,
