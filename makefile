@@ -1,4 +1,5 @@
 target := simplecalc
+args ?=
 
 #cflags
 clibs       := -lfl -ly
@@ -33,7 +34,7 @@ all: $(target)
 
 run: $(target)
 	@echo "./$(build_dir)/$(target)"
-	@./$(build_dir)/$(target) || exit "$$?"
+	@./$(build_dir)/$(target) $(args)
 
 test: $(target)
 	@./test.sh "$(build_dir)/$(target)" "$(tests_dir)"
