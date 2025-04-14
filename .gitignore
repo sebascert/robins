@@ -1,5 +1,8 @@
 build/
 
+# tests
+tests/**/output
+
 # lex and yacc
 lex.yy.c
 *.tab.c
@@ -13,5 +16,3 @@ lex.yy.c
 # graphviz
 *.dot
 *.png
-
-*.txt
