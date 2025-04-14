@@ -18,8 +18,8 @@ p                               { return PRINT; }
     /* operators */
 [-+*/()=]                       { return *yytext; }
     /* literals */
--?{num}+                        { yylval.vval.ival = atoi(yytext);  return INT_L; }
--?(\.{num}+|{num}+\.{num}*)     { yylval.vval.fval = strtof(yytext, NULL);  return FLOAT_L; }
+{num}+                          { yylval.vval.ival = atoi(yytext);  return INT_L; }
+(\.{num}+|{num}+\.{num}*)       { yylval.vval.fval = strtof(yytext, NULL);  return FLOAT_L; }
     /* identifiers */
 {_alpha}{_alphanum}*            { yylval.id = yytext; return VAR; }
     /* ignores */

@@ -13,7 +13,7 @@ int print_var(struct var var, FILE *fout) {
         fprintf(fout, "%d", var.val.ival);
         return 0;
     case VTYPE_FLOAT:
-        fprintf(fout, "%f", var.val.fval);
+        fprintf(fout, "%.2f", var.val.fval);
         return 0;
     default:
         return 1;

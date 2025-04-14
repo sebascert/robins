@@ -33,13 +33,13 @@ int yylex();
 program:
     /* epsilon */               { exit(0); }
 |   '\n' program
-|   primary_statement '\n' program
-|   error '\n'
+|   error '\n' program
+|   primary_statement program
 ;
 
 primary_statement:
-    statement                   { eval_ast_statement($1); free_node($1); }
-|   declaration                 { eval_ast_statement($1); free_node($1); }
+    statement '\n'              { eval_ast_statement($1); free_node($1); }
+|   declaration '\n'            { eval_ast_statement($1); free_node($1); }
 ;
 
 declaration:
@@ -56,13 +56,13 @@ statement:
 expression:
     term                        { $$ = $1; }
 |   '-' term                    { $$ = push_op('-', 1, $2); }
-|   term '+' expression         { $$ = push_op('+', 2, $1, $3); }
-|   term '-' expression         { $$ = push_op('-', 2, $1, $3); }
+|   expression '+' term         { $$ = push_op('+', 2, $1, $3); }
+|   expression '-' term         { $$ = push_op('-', 2, $1, $3); }
 ;
 term:
     factor                      { $$ = $1; }
-|   factor '*' term             { $$ = push_op('*', 2, $1, $3); }
-|   factor '/' term             { $$ = push_op('/', 2, $1, $3); }
+|   term '*' factor             { $$ = push_op('*', 2, $1, $3); }
+|   term '/' factor             { $$ = push_op('/', 2, $1, $3); }
 ;
 factor:
     id                          { $$ = $1; }
