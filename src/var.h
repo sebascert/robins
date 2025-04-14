@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 extern const char *const vtype_names[];
+
 typedef enum {
     VTYPE_NULL = -1,
     VTYPE_INT,
@@ -21,12 +22,20 @@ struct var {
 };
 
 extern struct var NULL_VAR;
+
+// no null checks for types performed
+
+// utils
 int print_var(struct var var, FILE *fout);
 
-struct var var_negate(struct var a);
-struct var var_add(struct var a, struct var b);
-struct var var_sub(struct var a, struct var b);
-struct var var_mul(struct var a, struct var b);
-struct var var_div(struct var a, struct var b);
+int cast_var(struct var var, var_type cast);
+union var_val type_default_val(var_type type);
+
+// arithmetic
+struct var negate_var(struct var a);
+struct var add_var(struct var a, struct var b);
+struct var sub_var(struct var a, struct var b);
+struct var mul_var(struct var a, struct var b);
+struct var div_var(struct var a, struct var b);
 
 #endif /* ifndef VAR_H */

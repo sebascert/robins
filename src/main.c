@@ -17,7 +17,7 @@ struct args {
 
 const char *argp_program_version = "simplecalc";
 static char doc[] = "simple calculator program";
-static char args_doc[] = "<sourcefile>\n--stdin";
+static char args_doc[] = "<sourcefile>\n-i|--stdin";
 
 #define ARG_GROUP(name, group) {0, 0, NULL, 0, name, group}
 static struct argp_option options[] = {
@@ -113,7 +113,12 @@ int main(int argc, char **argv) {
         fout = stdout;
     }
 
-    eval_ast_statement = args.graph ? ast_graph : interpret;
+    if (args.graph) {
+        eval_ast_statement = ast_graph;
+    } else {
+        eval_ast_statement = interpret;
+        initialize_interpreter();
+    }
 
     fprintf(stderr, "simple calc program\n");
 
