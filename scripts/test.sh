@@ -39,10 +39,6 @@ tests_dir="$2"
 
 echo "Running test..."
 
-if [ "$program" != ./\* ]; then
-    program="./$program"
-fi
-
 failed=0
 for test in "$tests_dir"/*/; do
     testname=$(basename "$test")

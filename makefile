@@ -1,5 +1,6 @@
 target := simplecalc
 args ?=
+test ?=
 
 #cflags
 clibs       := -lfl -ly
@@ -10,6 +11,7 @@ lexyacc_cflags :=
 src_dir     := src
 build_dir   := build
 tests_dir   := tests
+scripts_dir := scripts
 
 #lexyacc
 lex_c       := $(src_dir)/lex.yy.c
@@ -37,7 +39,14 @@ run: $(target)
 	@./$(build_dir)/$(target) $(args)
 
 test: $(target)
-	@./test.sh "$(build_dir)/$(target)" "$(tests_dir)"
+	@./$(scripts_dir)/test.sh "$(realpath $(build_dir)/$(target))" "$(realpath $(tests_dir))"
+
+add-test:
+ifeq ($(strip $(test)),)
+	@echo "missing test=<test>"
+else
+	@./$(scripts_dir)/add-test.sh "$(realpath $(tests_dir))" "$(test)"
+endif
 
 clean:
 	@rm -f $(lexyacc_sources) $(yacc_h)
@@ -49,7 +58,7 @@ clean-all:
 
 $(target): $(build_dir)/$(target)
 
-.PHONY: all clean run test $(target)
+.PHONY: all run test add-test clean clean-all $(target)
 
 $(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
 	gcc $(cflags) $(clibs) $(objs) $(lexyacc_objs) -o $@
