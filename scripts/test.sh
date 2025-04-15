@@ -63,12 +63,14 @@ for test in "$tests_dir"/*/; do
     # execute program and discard control output
     $program $test_args "$test_input" "--output=$test_output" 2>/dev/null
 
-    if diff=$(diff -y --expand-tabs "$test_expected" "$test_output"); then
+    if diff=$(diff -y "$test_expected" "$test_output"); then
         echo "PASSED"
     else
         echo "FAILED"
         echo "  DIFF:"
-        paste -d' ' "$test_input" <(echo "$diff") | sed 's/  / /g' | sed 's/   */\t\t/g'
+        input=$(grep -v '^//' <"$test_input")
+        lines=$(echo "$input" | wc -l)
+        paste <(seq 1 "$lines") <(echo "$input") <(echo "$diff") | column -s $'\t' -t
 
         failed=$((failed+1))
     fi
