@@ -39,9 +39,15 @@ struct var interpret_ast_node(const struct ast_node *node, FILE *fout) {
     if (!node)
         return NULL_VAR;
 
+    struct var_entry *entry;
     switch (node->type) {
     case NTYPE_ID:
-        return get_var(node->id.id)->v;
+        if (!(entry = get_var(node->id.id))) {
+            sserror(false, "interpret_ast_node: var '%s' not declared",
+                    node->id.id);
+            return NULL_VAR;
+        }
+        return entry->v;
     case NTYPE_CONST:
         return node->cst.v;
     case NTYPE_OP:
@@ -187,7 +193,7 @@ void op_decl(const struct op_node *node, FILE *fout) {
         init.val = type_default_val(init.type);
     } else {
         init = interpret_ast_node(node->operands[1], fout);
-        if (cast_var(init, node->op) != 0) {
+        if (cast_var(&init, node->op) != 0) {
             sserror(false, "op_decl: incompatible %s to %s cast\n",
                     vtype_names[init.type], vtype_names[node->op]);
             return;
@@ -232,7 +238,7 @@ int set_var(const char *id, struct var var) {
     if (!(entry = get_var(id)))
         return 1;
 
-    if (cast_var(entry->v, var.type) != 0) {
+    if (cast_var(&entry->v, var.type) != 0) {
         sserror(false, "set_var: incompatible %s to %s cast\n",
                 vtype_names[var.type], vtype_names[entry->v.type]);
         return 1;

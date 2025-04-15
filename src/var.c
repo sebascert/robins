@@ -25,21 +25,21 @@ int print_var(struct var var, FILE *fout) {
     }
 }
 
-int cast_var(struct var var, var_type cast) {
-    if (var.type == cast)
+int cast_var(struct var *var, var_type cast) {
+    if (var->type == cast)
         return 0;
 
-    switch (var.type) {
+    switch (var->type) {
     case VTYPE_INT:
         if (cast == VTYPE_FLOAT) {
-            var.val.fval = (float)var.val.ival;
+            var->val.fval = (float)var->val.ival;
             goto casted;
         }
         return 1;
 
     case VTYPE_FLOAT:
         if (cast == VTYPE_INT) {
-            var.val.ival = (int)var.val.fval;
+            var->val.ival = (int)var->val.fval;
             goto casted;
         }
         return 1;
@@ -48,7 +48,7 @@ int cast_var(struct var var, var_type cast) {
         return 1;
     }
 casted:
-    var.type = cast;
+    var->type = cast;
     return 0;
 }
 

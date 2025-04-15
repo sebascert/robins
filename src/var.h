@@ -28,7 +28,7 @@ extern struct var NULL_VAR;
 // utils
 int print_var(struct var var, FILE *fout);
 
-int cast_var(struct var var, var_type cast);
+int cast_var(struct var *var, var_type cast);
 union var_val type_default_val(var_type type);
 
 // arithmetic
