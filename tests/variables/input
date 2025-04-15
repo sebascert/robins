@@ -1,0 +1,10 @@
+i a=1
+p a
+i abc=0.5
+p abc
+var=b/a
+p var-1
+i bar=b/a
+p bar-1
+_=10*10
+p _
