@@ -1,35 +1,36 @@
-target := simplecalc
+target := robins
+
 args ?=
 test ?=
 
 #cflags
-clibs       := -lfl -ly
-cflags      := -Wall -Werror -g
-lexyacc_cflags :=
+clibs           := -lfl -ly
+cflags          := -Wall -Werror -g
+flexyacc_cflags :=
 
 #dirs
 src_dir     := src
 build_dir   := build
-tests_dir   := tests
+tests_dir   := test
 scripts_dir := scripts
 
-#lexyacc
-lex_c       := $(src_dir)/lex.yy.c
+#flexyacc
+flex_c      := $(src_dir)/lex.yy.c
 yacc_c      := $(src_dir)/y.tab.c
 yacc_h      := $(src_dir)/y.tab.h
-lexyacc_sources := $(lex_c) $(yacc_c)
+flexyacc_sources := $(flex_c) $(yacc_c)
 
 #sources
 lexer       := $(src_dir)/lexer.l
 parser      := $(src_dir)/parser.y
-sources     := $(filter-out $(lexyacc_sources), $(shell find $(src_dir) -name '*.c'))
+sources     := $(filter-out $(flexyacc_sources), $(shell find $(src_dir) -name '*.c'))
 
 # objects
-objs        := $(sources:.c=.o)
-lexyacc_objs   := $(lexyacc_sources:.c=.o)
+objs            := $(sources:.c=.o)
+flexyacc_objs   := $(flexyacc_sources:.c=.o)
 
-#lexyacc flags
-lexflags    ?=
+#flexyacc flags
+flexflags   ?=
 yaccflags   ?=
 
 all: $(target)
@@ -49,7 +50,7 @@ else
 endif
 
 clean:
-	@rm -f $(lexyacc_sources) $(yacc_h)
+	@rm -f $(flexyacc_sources) $(yacc_h)
 	@rm -f $(build_dir)/$(target)
 	@find . -name '*.o' -delete
 
@@ -60,11 +61,11 @@ $(target): $(build_dir)/$(target)
 
 .PHONY: all run test add-test clean clean-all $(target)
 
-$(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
-	gcc $(cflags) $(clibs) $(objs) $(lexyacc_objs) -o $@
+$(build_dir)/$(target): $(objs) $(flexyacc_objs) | $(build_dir)
+	gcc $(cflags) $(clibs) $(objs) $(flexyacc_objs) -o $@
 
-$(lex_c): $(lexer) $(yacc_h)
-	lex $(lexflags) --outfile="$(lex_c)" -- $(lexer)
+$(flex_c): $(flexer) $(yacc_h)
+	flex $(flexflags) --outfile="$(flex_c)" -- $(lexer)
 
 $(yacc_c) $(yacc_h): $(parser)
 	bison $(yaccflags) --output="$(yacc_c)" --header="$(yacc_h)" -- $(parser)
@@ -72,9 +73,9 @@ $(yacc_c) $(yacc_h): $(parser)
 %.o: %.c
 	gcc $(cflags) -c $< -o $@
 
-$(lexyacc_objs): $(lex_c) $(yacc_c)
-$(lexyacc_objs): %.o: %.c
-	gcc $(lexyacc_cflags) -c $< -o $@
+$(flexyacc_objs): $(flex_c) $(yacc_c)
+$(flexyacc_objs): %.o: %.c
+	gcc $(flexyacc_cflags) -c $< -o $@
 
 $(build_dir):
 	@mkdir -p $(build_dir)
