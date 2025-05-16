@@ -4,6 +4,7 @@
 
 ```
 .
+├── makefile
 ├── build
 │   └── robins
 ├── src
@@ -19,7 +20,8 @@
 │   └── ...
 ├── scripts
 │   └── ...
-└── makefile
+└── doc
+    └── ...
 ```
 
 ## dependencies
