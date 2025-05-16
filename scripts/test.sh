@@ -37,6 +37,21 @@ fi
 program="$1"
 tests_dir="$2"
 
+if [ ! -x "$program" ];then
+    echo "No program '$program'"
+    exit 1
+fi
+
+if [ ! -d "$tests_dir" ];then
+    echo "No test dir '$tests_dir'"
+    exit 1
+fi
+
+if [ -z "$(ls -A "$tests_dir")" ]; then
+    echo "No tests to run"
+    exit 0
+fi
+
 echo "Running test..."
 
 failed=0
