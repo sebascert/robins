@@ -1,5 +1,7 @@
 #include <argp.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "interpret.h"
 #include "parse.h"
@@ -76,6 +78,8 @@ static struct argp argp = {options, parse_opt, args_doc, doc};
 
 int yyparse(void);
 extern FILE *yyin;
+char *filename;
+char *stdin_filename = "stdin";
 
 ast_evaluator eval_ast_statement;
 
@@ -99,8 +103,14 @@ int main(int argc, char **argv) {
             fprintf(stderr, "unable to open '%s'", args.source_file);
             return 1;
         }
+        filename = strdup(args.source_file);
+        if (!filename) {
+            perror("memory error\n");
+            exit(1);
+        }
     } else {
         yyin = stdin;
+        filename = stdin_filename;
     }
 
     if (args.output_file) {
@@ -129,3 +139,4 @@ int main(int argc, char **argv) {
 
     return yycode;
 }
+

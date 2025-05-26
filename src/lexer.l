@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include "parse.h"
 #include "y.tab.h"
+
+void yyerror(const char* s);
+
+extern int yylineno;
+
+static char lex_err[] = "error: unexpected token ' '";
 %}
 
 num         [0-9]
@@ -12,7 +18,7 @@ _alphanum   [_A-Za-z0-9]
 
 %%
     /* operators */
-[-+*/()]                       { return *yytext; }
+[-+*/()]                        { return *yytext; }
     /* literals */
 {num}+                          { yylval.vval.ival = atoi(yytext);  return INT_L; }
 (\.{num}+|{num}+\.{num}*)       { yylval.vval.fval = strtof(yytext, NULL);  return FLOAT_L; }
@@ -20,14 +26,15 @@ _alphanum   [_A-Za-z0-9]
 \/\/.*                          ; /* ignore comments */
 [ \t]                           ; /* ignore whitespace */
     /* statement terminator */
-\n                              { return *yytext; }
+\n                              { yylineno++; return '\n'; }
     /* lexical error */
-.   {
-    yyerror("invalid token");
+.  {
+    lex_err[25] = *yytext;
+    yyerror(lex_err);
 
-    // ignore line
     int c;
     while ((c = input()) != '\n' && c != EOF) ;
+    yylineno++;
     return '\n';
 }
 %%

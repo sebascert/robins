@@ -69,5 +69,6 @@ struct ast_node *push_const(var_type type, union var_val val) {
 
 void yyerror(const char *s) {
     extern int yylineno;
-    fprintf(stderr, "line %d: %s\n", yylineno, s);
+    extern char *filename;
+    fprintf(stderr, "%s:%d: %s\n", filename, yylineno, s);
 }
