@@ -2,7 +2,6 @@
 #include "parse.h"
 
 static int serialized_ntype_count[] = {
-    [NTYPE_ID] = 0,
     [NTYPE_OP] = 0,
     [NTYPE_CONST] = 0,
 };
@@ -17,14 +16,6 @@ const char *serialize_op(int operand) {
         return "*";
     case '/':
         return "/";
-    case '=':
-        return "=";
-    case 'p':
-        return "print";
-    case VTYPE_INT:
-        return "int";
-    case VTYPE_FLOAT:
-        return "float";
     default:
         sserror(true, "operand_to_str: invalid operand\n");
         return NULL;
@@ -35,7 +26,6 @@ int serialize_ast_nodes(const struct ast_node *node, FILE *fout) {
     if (!node)
         return -1;
     static const char *ntype_strid[] = {
-        [NTYPE_ID] = "id",
         [NTYPE_OP] = "op",
         [NTYPE_CONST] = "cst",
     };
@@ -45,7 +35,6 @@ int serialize_ast_nodes(const struct ast_node *node, FILE *fout) {
     size_t node_id;
 
     switch (type) {
-    case NTYPE_ID:
     case NTYPE_OP:
     case NTYPE_CONST:
         node_id = serialized_ntype_count[type]++;
@@ -57,10 +46,6 @@ int serialize_ast_nodes(const struct ast_node *node, FILE *fout) {
     }
 
     switch (type) {
-    case NTYPE_ID:
-        label = node->id.id;
-        break;
-
     case NTYPE_OP:
         label = serialize_op(node->op.op);
         for (size_t i = 0; i < node->op.n_operands; i++) {

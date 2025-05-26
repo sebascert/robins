@@ -12,10 +12,6 @@ void free_node(struct ast_node *node) {
     }
 
     switch (node->type) {
-    case NTYPE_ID:
-        free(node->id.id);
-        free(node);
-        break;
     case NTYPE_OP:
         for (size_t i = 0; i < node->op.n_operands; i++) {
             free_node(node->op.operands[i]);
@@ -27,29 +23,6 @@ void free_node(struct ast_node *node) {
         free(node);
         break;
     }
-}
-
-struct ast_node *push_id(const char *id) {
-    if (!id) {
-        yyerror("push_id received null id");
-        return NULL;
-    }
-
-    struct ast_node *node = malloc(sizeof(struct ast_node));
-    if (!node) {
-        yyerror("unable to allocate memory for AST nodes");
-        return NULL;
-    }
-
-    node->id.id = strdup(id);
-    if (!node->id.id) {
-        free(node);
-        yyerror("unable to allocate memory for AST nodes");
-        return NULL;
-    }
-
-    node->type = NTYPE_ID;
-    return node;
 }
 
 struct ast_node *push_op(int op, size_t n_operands, ...) {

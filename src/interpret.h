@@ -6,9 +6,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define VAR_ID_SIZE 10
-#define MAX_VAR_ENTRIES 26
-
 void initialize_interpreter(void);
 
 // serialize ast into graphviz representation
