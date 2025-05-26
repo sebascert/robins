@@ -22,5 +22,12 @@ _alphanum   [_A-Za-z0-9]
     /* statement terminator */
 \n                              { return *yytext; }
     /* lexical error */
-.                               { yyerror("invalid token"); }
+.   {
+    yyerror("invalid token");
+
+    // ignore line
+    int c;
+    while ((c = input()) != '\n' && c != EOF) ;
+    return '\n';
+}
 %%
