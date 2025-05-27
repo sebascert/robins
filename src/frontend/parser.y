@@ -1,19 +1,19 @@
 %{
 #include "ast/node.h"
-#include "frontend/yydefs.h"
+#include "frontend/yyshared.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 %}
 
 %union {
-    union var_val vval;
-    struct ast_node* nptr;
+    union literal_v lval;
+    struct astnode* nptr;
 }
 
 /* literals */
-%token <vval> INT_L
-%token <vval> FLOAT_L
+%token <lval> INT_L
+%token <lval> REAL_L
 /* types */
 %type <nptr> num_literal
 %type <nptr> statement
@@ -48,7 +48,7 @@ factor:
 ;
 
 num_literal:
-    INT_L                       { $$ = push_const(VTYPE_INT, $1); }
-|   FLOAT_L                     { $$ = push_const(VTYPE_FLOAT, $1); }
+    INT_L                       { $$ = push_literal(LITERAL_T_INT, $1); }
+|   REAL_L                     { $$ = push_literal(LITERAL_T_REAL, $1); }
 ;
 %%

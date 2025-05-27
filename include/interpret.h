@@ -8,12 +8,10 @@
 
 void initialize_interpreter(void);
 
-// serialize ast into graphviz representation
-void serialize_ast(const struct ast_node *ast, FILE *fout);
+// output file of interpret_ast
+extern FILE *interpret_ast_out;
 
 // interpret abstract syntax tree
-void interpret_ast(const struct ast_node *ast, FILE *fout);
-
-void sserror(bool terminate, const char *s, ...);
+void interpret_ast(const struct astnode *ast);
 
 #endif /* ifndef INTERPRET_H */

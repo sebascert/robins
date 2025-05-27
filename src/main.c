@@ -1,10 +1,9 @@
 #include <argp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#include "ast/node.h"
-#include "frontend/yydefs.h"
+#include "ast/serializer.h"
+#include "frontend/yyshared.h"
 #include "interpret.h"
 
 // argument parsing with argp
@@ -75,18 +74,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     return 0;
 }
 
-static struct argp argp = {options, parse_opt, args_doc, doc};
+static struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL, NULL};
 
-int yyparse(void);
-extern FILE *yyin;
-char *filename;
-char *stdin_filename = "stdin";
-
-ast_evaluator eval_ast_statement;
+static char stdin_filename[] = "stdin";
 
 static FILE *fout;
-void ast_graph(const struct ast_node *ast) { serialize_ast(ast, fout); }
-void interpret(const struct ast_node *ast) { interpret_ast(ast, fout); }
 
 int main(int argc, char **argv) {
     struct args args = {
@@ -100,18 +92,14 @@ int main(int argc, char **argv) {
 
     if (!args.stdin) {
         yyin = fopen(args.source_file, "r");
+        yyfilename = args.source_file;
         if (!yyin) {
             fprintf(stderr, "unable to open '%s'", args.source_file);
             return 1;
         }
-        filename = strdup(args.source_file);
-        if (!filename) {
-            perror("memory error\n");
-            exit(1);
-        }
     } else {
         yyin = stdin;
-        filename = stdin_filename;
+        yyfilename = stdin_filename;
     }
 
     if (args.output_file) {
@@ -125,9 +113,11 @@ int main(int argc, char **argv) {
     }
 
     if (args.graph) {
-        eval_ast_statement = ast_graph;
+        serialize_ast_out = fout;
+        eval_ast_statement = serialize_ast;
     } else {
-        eval_ast_statement = interpret;
+        interpret_ast_out = fout;
+        eval_ast_statement = interpret_ast;
         initialize_interpreter();
     }
 
@@ -135,6 +125,7 @@ int main(int argc, char **argv) {
 
     int yycode = yyparse();
 
+    // cleanup
     fclose(yyin);
     fclose(fout);
 

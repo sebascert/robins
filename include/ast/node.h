@@ -4,36 +4,27 @@
 #include <stddef.h>
 
 #include "ast/literal.h"
+#include "ast/operation.h"
 
-struct ast_node;
+extern const char *astnode_t_names[];
 
 typedef enum {
-    NTYPE_OP,
-    NTYPE_CONST,
-} node_type;
+    ASTNODE_T_OPERATION,
+    ASTNODE_T_LITERAL,
+} astnode_t;
 
-struct op_node {
-    int op;
-    size_t n_operands;
-    struct ast_node **operands;
-};
-
-struct cst_node {
-    struct var v;
-};
-
-struct ast_node {
-    node_type type;
+struct astnode {
+    astnode_t type;
     union {
-        struct op_node op;
-        struct cst_node cst;
+        struct operation op;
+        struct literal lit;
     };
 };
 
-void free_node(struct ast_node *node);
+void free_node(struct astnode *node);
 
-struct ast_node *push_op(int op, size_t n_operands, ...);
-struct ast_node *push_const(var_type type, union var_val val);
+struct astnode *push_op(operation_t op, size_t n_operands, ...);
+struct astnode *push_literal(literal_t type, union literal_v val);
 
 void yyerror(const char *s);
 

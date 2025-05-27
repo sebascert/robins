@@ -2,44 +2,44 @@
 
 #include <stdio.h>
 
-const char *const vtype_names[] = {
-    [VTYPE_INT] = "int",
-    [VTYPE_FLOAT] = "float",
+const char *const literal_t_names[] = {
+    [LITERAL_T_INT] = "int",
+    [LITERAL_T_REAL] = "float",
 };
 
-struct var NULL_VAR = {
-    .type = VTYPE_NULL,
+struct literal NULL_LITERAL = {
+    .type = LITERAL_T_NULL,
     .val = {0},
 };
 
-int print_var(struct var var, FILE *fout) {
-    switch (var.type) {
-    case VTYPE_INT:
-        fprintf(fout, "%d", var.val.ival);
+int print_lit(const struct literal *lit, FILE *fout) {
+    switch (lit->type) {
+    case LITERAL_T_INT:
+        fprintf(fout, "%d", lit->val.ival);
         return 0;
-    case VTYPE_FLOAT:
-        fprintf(fout, "%.2f", var.val.fval);
+    case LITERAL_T_REAL:
+        fprintf(fout, "%.2f", lit->val.rval);
         return 0;
     default:
         return 1;
     }
 }
 
-int cast_var(struct var *var, var_type cast) {
-    if (var->type == cast)
+int cast_lit(struct literal *lit, literal_t cast) {
+    if (lit->type == cast)
         return 0;
 
-    switch (var->type) {
-    case VTYPE_INT:
-        if (cast == VTYPE_FLOAT) {
-            var->val.fval = (float)var->val.ival;
+    switch (lit->type) {
+    case LITERAL_T_INT:
+        if (cast == LITERAL_T_REAL) {
+            lit->val.rval = (float)lit->val.ival;
             goto casted;
         }
         return 1;
 
-    case VTYPE_FLOAT:
-        if (cast == VTYPE_INT) {
-            var->val.ival = (int)var->val.fval;
+    case LITERAL_T_REAL:
+        if (cast == LITERAL_T_INT) {
+            lit->val.ival = (int)lit->val.rval;
             goto casted;
         }
         return 1;
@@ -48,71 +48,74 @@ int cast_var(struct var *var, var_type cast) {
         return 1;
     }
 casted:
-    var->type = cast;
+    lit->type = cast;
     return 0;
 }
 
-union var_val type_default_val(var_type type) {
+union literal_v literal_default(literal_t type) {
     switch (type) {
-    case VTYPE_INT:
-        return (union var_val){.ival = 0};
+    case LITERAL_T_INT:
+        return (union literal_v){.ival = 0};
 
-    case VTYPE_FLOAT:
-        return (union var_val){.fval = 0.0f};
+    case LITERAL_T_REAL:
+        return (union literal_v){.rval = 0.0f};
 
     default:
-        return (union var_val)0;
+        return (union literal_v)0;
     }
 }
 
-struct var negate_var(struct var a) {
-    struct var res = a;
-    if (a.type == VTYPE_INT) {
+struct literal negate_lit(struct literal a) {
+    struct literal res = a;
+    if (a.type == LITERAL_T_INT) {
         res.val.ival = -a.val.ival;
-    } else if (a.type == VTYPE_FLOAT) {
-        res.val.fval = -a.val.fval;
+    } else if (a.type == LITERAL_T_REAL) {
+        res.val.rval = -a.val.rval;
     } else {
-        return NULL_VAR;
+        return NULL_LITERAL;
     }
 
     return res;
 }
 
-struct var add_var(struct var a, struct var b) {
-    if (a.type == VTYPE_FLOAT || b.type == VTYPE_FLOAT) {
-        float lhs = a.type == VTYPE_FLOAT ? a.val.fval : (float)a.val.ival;
-        float rhs = b.type == VTYPE_FLOAT ? b.val.fval : (float)b.val.ival;
-        return (struct var){VTYPE_FLOAT, .val.fval = lhs + rhs};
+struct literal add_lit(struct literal a, struct literal b) {
+    if (a.type == LITERAL_T_REAL || b.type == LITERAL_T_REAL) {
+        float lhs = a.type == LITERAL_T_REAL ? a.val.rval : (float)a.val.ival;
+        float rhs = b.type == LITERAL_T_REAL ? b.val.rval : (float)b.val.ival;
+        return (struct literal){LITERAL_T_REAL, .val.rval = lhs + rhs};
     } else {
-        return (struct var){VTYPE_INT, .val.ival = a.val.ival + b.val.ival};
+        return (struct literal){LITERAL_T_INT,
+                                .val.ival = a.val.ival + b.val.ival};
     }
 }
 
-struct var sub_var(struct var a, struct var b) {
-    if (a.type == VTYPE_FLOAT || b.type == VTYPE_FLOAT) {
-        float lhs = a.type == VTYPE_FLOAT ? a.val.fval : (float)a.val.ival;
-        float rhs = b.type == VTYPE_FLOAT ? b.val.fval : (float)b.val.ival;
-        return (struct var){VTYPE_FLOAT, .val.fval = lhs - rhs};
+struct literal sub_lit(struct literal a, struct literal b) {
+    if (a.type == LITERAL_T_REAL || b.type == LITERAL_T_REAL) {
+        float lhs = a.type == LITERAL_T_REAL ? a.val.rval : (float)a.val.ival;
+        float rhs = b.type == LITERAL_T_REAL ? b.val.rval : (float)b.val.ival;
+        return (struct literal){LITERAL_T_REAL, .val.rval = lhs - rhs};
     } else {
-        return (struct var){VTYPE_INT, .val.ival = a.val.ival - b.val.ival};
+        return (struct literal){LITERAL_T_INT,
+                                .val.ival = a.val.ival - b.val.ival};
     }
 }
 
-struct var mul_var(struct var a, struct var b) {
-    if (a.type == VTYPE_FLOAT || b.type == VTYPE_FLOAT) {
-        float lhs = a.type == VTYPE_FLOAT ? a.val.fval : (float)a.val.ival;
-        float rhs = b.type == VTYPE_FLOAT ? b.val.fval : (float)b.val.ival;
-        return (struct var){VTYPE_FLOAT, .val.fval = lhs * rhs};
+struct literal mul_lit(struct literal a, struct literal b) {
+    if (a.type == LITERAL_T_REAL || b.type == LITERAL_T_REAL) {
+        float lhs = a.type == LITERAL_T_REAL ? a.val.rval : (float)a.val.ival;
+        float rhs = b.type == LITERAL_T_REAL ? b.val.rval : (float)b.val.ival;
+        return (struct literal){LITERAL_T_REAL, .val.rval = lhs * rhs};
     } else {
-        return (struct var){VTYPE_INT, .val.ival = a.val.ival * b.val.ival};
+        return (struct literal){LITERAL_T_INT,
+                                .val.ival = a.val.ival * b.val.ival};
     }
 }
 
-struct var div_var(struct var a, struct var b) {
-    float lhs = a.type == VTYPE_FLOAT ? a.val.fval : (float)a.val.ival;
-    float rhs = b.type == VTYPE_FLOAT ? b.val.fval : (float)b.val.ival;
+struct literal div_lit(struct literal a, struct literal b) {
+    float lhs = a.type == LITERAL_T_REAL ? a.val.rval : (float)a.val.ival;
+    float rhs = b.type == LITERAL_T_REAL ? b.val.rval : (float)b.val.ival;
 
     if (rhs == 0)
-        return NULL_VAR;
-    return (struct var){VTYPE_FLOAT, .val.fval = lhs / rhs};
+        return NULL_LITERAL;
+    return (struct literal){LITERAL_T_REAL, .val.rval = lhs / rhs};
 }

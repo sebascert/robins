@@ -3,39 +3,39 @@
 
 #include <stdio.h>
 
-extern const char *const vtype_names[];
+extern const char *const literal_t_names[];
 
 typedef enum {
-    VTYPE_NULL = -1,
-    VTYPE_INT,
-    VTYPE_FLOAT,
-} var_type;
+    LITERAL_T_NULL = -1,
+    LITERAL_T_INT,
+    LITERAL_T_REAL,
+} literal_t;
 
-union var_val {
+union literal_v {
     int ival;
-    float fval;
+    double rval;
 };
 
-struct var {
-    var_type type;
-    union var_val val;
+struct literal {
+    literal_t type;
+    union literal_v val;
 };
 
-extern struct var NULL_VAR;
+extern struct literal NULL_LITERAL;
 
 // no null checks for types performed
 
 // utils
-int print_var(struct var var, FILE *fout);
+int print_lit(const struct literal *lit, FILE *fout);
 
-int cast_var(struct var *var, var_type cast);
-union var_val type_default_val(var_type type);
+int cast_lit(struct literal *lit, literal_t cast);
+union literal_v literal_default(literal_t type);
 
 // arithmetic
-struct var negate_var(struct var a);
-struct var add_var(struct var a, struct var b);
-struct var sub_var(struct var a, struct var b);
-struct var mul_var(struct var a, struct var b);
-struct var div_var(struct var a, struct var b);
+struct literal negate_lit(struct literal a);
+struct literal add_lit(struct literal a, struct literal b);
+struct literal sub_lit(struct literal a, struct literal b);
+struct literal mul_lit(struct literal a, struct literal b);
+struct literal div_lit(struct literal a, struct literal b);
 
 #endif /* ifndef AST_LITERAL_H */
