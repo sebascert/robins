@@ -1,6 +1,6 @@
 #include "interpret.h"
-#include "parse.h"
-#include "var.h"
+#include "ast/literal.h"
+#include "ast/node.h"
 
 #include <stdarg.h>
 #include <stdio.h>

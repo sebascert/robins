@@ -1,5 +1,5 @@
-#ifndef VAR_H
-#define VAR_H
+#ifndef AST_LITERAL_H
+#define AST_LITERAL_H
 
 #include <stdio.h>
 
@@ -38,4 +38,4 @@ struct var sub_var(struct var a, struct var b);
 struct var mul_var(struct var a, struct var b);
 struct var div_var(struct var a, struct var b);
 
-#endif /* ifndef VAR_H */
+#endif /* ifndef AST_LITERAL_H */

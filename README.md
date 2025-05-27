@@ -6,15 +6,10 @@
 .
 ├── build
 │   └── robins
+├── include
+│   └── headers
 ├── src
-│   ├── main.c
-│   ├── lexer.l
-│   ├── parser.y
-│   ├── parse.c
-│   ├── parse.h
-│   ├── code_generator.c
-│   ├── code_generator.h
-│   └── serialize_ast.c
+│   └── TUs, lexer, parser
 ├── tests
 │   └── ...
 ├── scripts
@@ -24,7 +19,7 @@
 
 ## dependencies
 
-The project depends on `flex` for lexical analysis and `bison` syntactical
+The project depends on `flex` for lexical analysis and `bison` for syntactical
 analysis, the library `libbison-dev` is required for linking `liby.a`.
 
 Example installation on Ubuntu:

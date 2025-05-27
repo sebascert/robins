@@ -3,8 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "ast/node.h"
+#include "frontend/yydefs.h"
 #include "interpret.h"
-#include "parse.h"
 
 // argument parsing with argp
 struct args {
@@ -139,4 +140,3 @@ int main(int argc, char **argv) {
 
     return yycode;
 }
-

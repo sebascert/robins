@@ -1,10 +1,9 @@
 %{
+#include "ast/node.h"
+#include "frontend/yydefs.h"
+
 #include <stdlib.h>
 #include <stdio.h>
-#include "parse.h"
-#include "interpret.h"
-
-int yylex();
 %}
 
 %union {

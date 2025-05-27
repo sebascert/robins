@@ -1,7 +1,7 @@
 #ifndef INTERPRET_H
 #define INTERPRET_H
 
-#include "parse.h"
+#include "ast/node.h"
 
 #include <stdbool.h>
 #include <stdio.h>

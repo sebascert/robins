@@ -1,5 +1,5 @@
+#include "ast/node.h"
 #include "interpret.h"
-#include "parse.h"
 
 static int serialized_ntype_count[] = {
     [NTYPE_OP] = 0,

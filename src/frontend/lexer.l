@@ -1,11 +1,8 @@
 %{
-#include <stdlib.h>
-#include "parse.h"
-#include "y.tab.h"
-
-void yyerror(const char* s);
-
-extern int yylineno;
+// this is needed to avoid double defs from stdio imported in ast/literal.h
+#define _STDIO_H
+#include "ast/node.h"
+#include "parser.h"
 
 static char lex_err[] = "error: unexpected token ' '";
 %}
