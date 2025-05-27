@@ -1,4 +1,9 @@
-# Robins (Robot Instruction Compiler)
+# ROBINS (Robot Instruction Compiler)
+
+ROBINS compiles natural language imperative instructions into assembly-like
+commands. It is designed for lightweight applications that need to convert
+natural language into a more manageable, structured encoding. Both the natural
+language syntax and its mappings are fully configurable.
 
 ## Project Structure
 
@@ -6,15 +11,10 @@
 .
 ├── build
 │   └── robins
+├── include
+│   └── headers
 ├── src
-│   ├── main.c
-│   ├── lexer.l
-│   ├── parser.y
-│   ├── parse.c
-│   ├── parse.h
-│   ├── code_generator.c
-│   ├── code_generator.h
-│   └── serialize_ast.c
+│   └── TUs, lexer, parser
 ├── tests
 │   └── ...
 ├── scripts
@@ -24,7 +24,11 @@
 
 ## dependencies
 
-The project depends on `flex` for lexical analysis and `bison` syntactical
+- **argp**
+- **flex**
+- **bison**: libbison-dev
+
+The project uses `flex` for lexical analysis and `bison` for syntactical
 analysis, the library `libbison-dev` is required for linking `liby.a`.
 
 Example installation on Ubuntu:

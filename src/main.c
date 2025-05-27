@@ -1,23 +1,24 @@
 #include <argp.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-#include "interpret.h"
-#include "parse.h"
+#include "ast/serializer.h"
+#include "backend/translator.h"
+#include "frontend/yyshared.h"
 
 // argument parsing with argp
 struct args {
     unsigned int stdin : 1;
     /* modes */
     unsigned int graph : 1;
-    unsigned int interpret : 1;
 
     char *source_file;
     char *output_file;
 };
 
-const char *argp_program_version = "simplecalc";
-static char doc[] = "simple calculator program";
-static char args_doc[] = "<sourcefile>\n-i|--stdin";
+const char *argp_program_version = "0.1";
+static char doc[] = "Robot Instruction Compiler";
+static char args_doc[] = "<source>\n-i|--stdin";
 
 #define ARG_GROUP(name, group) {0, 0, NULL, 0, name, group}
 static struct argp_option options[] = {
@@ -25,8 +26,6 @@ static struct argp_option options[] = {
     {"stdin", 'i', NULL, 0, "input from stdin instead of <sourcefile>", 1},
     {"output", 'o', "FILE", 0, "output to FILE instead of stdout", 1},
     ARG_GROUP("modes:", 2),
-    {"interpret", 'I', NULL, 0, "interpret input line by line, set by default",
-     2},
     {"graph", 'g', NULL, 0, "generate graphviz graph of the AST", 2},
     {0}};
 
@@ -39,9 +38,6 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         break;
     case 'o':
         args->output_file = arg;
-        break;
-    case 'I':
-        args->interpret = 1;
         break;
     case 'g':
         args->graph = 1;
@@ -61,9 +57,6 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
             argp_error(state, "conflicting '%s' and --stdin",
                        args->source_file);
         }
-        if (args->graph && args->interpret) {
-            argp_error(state, "conflicting --graph and --interpret");
-        }
         break;
     default:
         return ARGP_ERR_UNKNOWN;
@@ -72,21 +65,15 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     return 0;
 }
 
-static struct argp argp = {options, parse_opt, args_doc, doc};
+static struct argp argp = {options, parse_opt, args_doc, doc, NULL, NULL, NULL};
 
-int yyparse(void);
-extern FILE *yyin;
-
-ast_evaluator eval_ast_statement;
+static char stdin_filename[] = "stdin";
 
 static FILE *fout;
-void ast_graph(const struct ast_node *ast) { serialize_ast(ast, fout); }
-void interpret(const struct ast_node *ast) { interpret_ast(ast, fout); }
 
 int main(int argc, char **argv) {
     struct args args = {
         .stdin = 0,
-        .interpret = 0,
         .graph = 0,
         .source_file = NULL,
         .output_file = NULL,
@@ -95,12 +82,14 @@ int main(int argc, char **argv) {
 
     if (!args.stdin) {
         yyin = fopen(args.source_file, "r");
+        yyfilename = args.source_file;
         if (!yyin) {
             fprintf(stderr, "unable to open '%s'", args.source_file);
             return 1;
         }
     } else {
         yyin = stdin;
+        yyfilename = stdin_filename;
     }
 
     if (args.output_file) {
@@ -114,16 +103,18 @@ int main(int argc, char **argv) {
     }
 
     if (args.graph) {
-        eval_ast_statement = ast_graph;
+        serialize_ast_out = fout;
+        eval_ast_statement = serialize_ast;
     } else {
-        eval_ast_statement = interpret;
-        initialize_interpreter();
+        translate_ast_out = fout;
+        eval_ast_statement = translate_ast;
     }
 
-    fprintf(stderr, "simple calc program\n");
+    fprintf(stderr, "robins\n");
 
     int yycode = yyparse();
 
+    // cleanup
     fclose(yyin);
     fclose(fout);
 
