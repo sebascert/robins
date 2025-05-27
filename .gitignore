@@ -1,13 +1,17 @@
-build/
+/build/
+
+# clang
+/.cache/clangd
+/compile_commands.json
 
 # tests
-tests/**/output
+/tests/**/output
 
 # lex and yacc
-lex.yy.c
-*.tab.c
-*.tab.h
-*.tab.h.gch
+lexer.i
+parser.i
+lexer.c
+parser.c
 
 # c
 *.o

@@ -1,44 +1,66 @@
-target := robins
+target  := robins
 
-args ?=
-test ?=
+args    ?=
+test    ?=
 
-#cflags
-clibs           := -lfl -ly
-cflags          := -Wall -Werror -g
-flexyacc_cflags :=
-
-#dirs
+# dirs
 src_dir     := src
+include_dir := include
 build_dir   := build
-tests_dir   := test
+tests_dir   := tests
 scripts_dir := scripts
 
-#flexyacc
-flex_c      := $(src_dir)/lex.yy.c
-yacc_c      := $(src_dir)/y.tab.c
-yacc_h      := $(src_dir)/y.tab.h
-flexyacc_sources := $(flex_c) $(yacc_c)
+# sources and headers
+lexer               := $(src_dir)/frontend/lexer.l
+parser              := $(src_dir)/frontend/parser.y
+lex_i               := $(lexer:.l=.i)
+yacc_i              := $(parser:.y=.i)
+lex_c               := $(lexer:.l=.c)
+yacc_c              := $(parser:.y=.c)
+yacc_h              := $(parser:.y=.h)
+lexyacc_sources     := $(lex_c) $(yacc_c)
+lexyacc_genfiles    := $(lex_i) $(yacc_i) $(lexyacc_sources) $(yacc_h)
 
-#sources
-lexer       := $(src_dir)/lexer.l
-parser      := $(src_dir)/parser.y
-sources     := $(filter-out $(flexyacc_sources), $(shell find $(src_dir) -name '*.c'))
+sources     := $(filter-out $(lexyacc_sources), $(shell find $(src_dir) -name '*.c'))
+headers     := $(shell find $(include_dir) -name '*.h')
 
 # objects
 objs            := $(sources:.c=.o)
-flexyacc_objs   := $(flexyacc_sources:.c=.o)
+lexyacc_objs    := $(lexyacc_sources:.c=.o)
 
-#flexyacc flags
-flexflags   ?=
-yaccflags   ?=
+# compiler setup
+CPP         := cpp
+cppflags    := -P -I$(include_dir)
+CC          := gcc
+CSTD        := c99
+CLINK       := -lfl -ly
+CFLAGS      := -Wall -Wextra -std=$(CSTD) -I$(include_dir)
+ifeq ($(BUILD),release)
+	target += _release
+	CFLAGS += -O2
+else
+	CFLAGS += -g
+endif
 
+#lexyacc flags
+LEX             := flex
+YACC            := bison
+LEXYACC_CFLAGS  :=
+LEXFLAGS        ?=
+YACCFLAGS       ?=
+
+CLANGDB   := compile_commands.json
+
+MAKEFLAGS += --no-print-directory
+
+# target rules
 all: $(target)
 
-run: $(target)
-	@echo "./$(build_dir)/$(target)"
-	@./$(build_dir)/$(target) $(args)
+$(target): $(build_dir)/$(target)
 
+.PHONY: all $(target)
+
+# utils rules
 test: $(target)
 	@./$(scripts_dir)/test.sh "$(realpath $(build_dir)/$(target))" "$(realpath $(tests_dir))"
 
@@ -49,33 +71,55 @@ else
 	@./$(scripts_dir)/add-test.sh "$(realpath $(tests_dir))" "$(test)"
 endif
 
-clean:
-	@rm -f $(flexyacc_sources) $(yacc_h)
-	@rm -f $(build_dir)/$(target)
-	@find . -name '*.o' -delete
+format:
+	@clang-format -i $(headers) $(sources)
 
-clean-all:
-	@rm -rf $(build_dir)
+lint: $(CLANGDB)
+	@clang-tidy $(headers) $(sources) -p .
 
-$(target): $(build_dir)/$(target)
+clangdb: clean-clangdb
+	@$(MAKE) $(CLANGDB)
 
-.PHONY: all run test add-test clean clean-all $(target)
+.PHONY: test add-test format lint clangdb
 
-$(build_dir)/$(target): $(objs) $(flexyacc_objs) | $(build_dir)
-	gcc $(cflags) $(clibs) $(objs) $(flexyacc_objs) -o $@
-
-$(flex_c): $(flexer) $(yacc_h)
-	flex $(flexflags) --outfile="$(flex_c)" -- $(lexer)
-
-$(yacc_c) $(yacc_h): $(parser)
-	bison $(yaccflags) --output="$(yacc_c)" --header="$(yacc_h)" -- $(parser)
+# compilation rules
+$(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
+	@$(CC) $(CFLAGS) $(CLINK) $^ -o $@
 
 %.o: %.c
-	gcc $(cflags) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
-$(flexyacc_objs): $(flex_c) $(yacc_c)
-$(flexyacc_objs): %.o: %.c
-	gcc $(flexyacc_cflags) -c $< -o $@
+$(lex_i): $(lexer) $(yacc_h)
+	@$(CPP) $(cppflags) $(lexer) -o $(lex_i)
+$(yacc_i): $(parser)
+	@$(CPP) $(cppflags) $(parser) -o $(yacc_i)
+
+$(lex_c): $(lex_i)
+	@$(LEX) $(LEXFLAGS) --outfile="$(lex_c)" -- $(lex_i)
+$(yacc_c) $(yacc_h): $(yacc_i)
+	@$(YACC) $(YACCFLAGS) --output="$(yacc_c)" --header="$(yacc_h)" -- $(yacc_i)
+
+# $(lexyacc_objs): $(lex_c) $(yacc_c)
+$(lexyacc_objs): %.o: %.c
+	$(CC) $(LEXYACC_CFLAGS) -c $< -o $@
+
+$(CLANGDB):
+	@$(MAKE) clean
+	@bear -- $(MAKE) $(objs)
 
 $(build_dir):
 	@mkdir -p $(build_dir)
+
+# clean rules
+clean:
+	@rm -rf $(build_dir)
+	@rm -f $(lexyacc_genfiles)
+	@find . -name '*.o' -exec rm -f {} +
+
+clean-clangdb:
+	@rm -f $(CLANGDB)
+	@rm -rf .cache/clangd
+
+clean-all: clean clean-clangdb
+
+.PHONY: clean clean-clangdb clean-all
