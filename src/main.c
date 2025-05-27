@@ -3,15 +3,14 @@
 #include <stdlib.h>
 
 #include "ast/serializer.h"
+#include "backend/translator.h"
 #include "frontend/yyshared.h"
-#include "interpret.h"
 
 // argument parsing with argp
 struct args {
     unsigned int stdin : 1;
     /* modes */
     unsigned int graph : 1;
-    unsigned int interpret : 1;
 
     char *source_file;
     char *output_file;
@@ -27,8 +26,6 @@ static struct argp_option options[] = {
     {"stdin", 'i', NULL, 0, "input from stdin instead of <sourcefile>", 1},
     {"output", 'o', "FILE", 0, "output to FILE instead of stdout", 1},
     ARG_GROUP("modes:", 2),
-    {"interpret", 'I', NULL, 0, "interpret input line by line, set by default",
-     2},
     {"graph", 'g', NULL, 0, "generate graphviz graph of the AST", 2},
     {0}};
 
@@ -41,9 +38,6 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         break;
     case 'o':
         args->output_file = arg;
-        break;
-    case 'I':
-        args->interpret = 1;
         break;
     case 'g':
         args->graph = 1;
@@ -63,9 +57,6 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
             argp_error(state, "conflicting '%s' and --stdin",
                        args->source_file);
         }
-        if (args->graph && args->interpret) {
-            argp_error(state, "conflicting --graph and --interpret");
-        }
         break;
     default:
         return ARGP_ERR_UNKNOWN;
@@ -83,7 +74,6 @@ static FILE *fout;
 int main(int argc, char **argv) {
     struct args args = {
         .stdin = 0,
-        .interpret = 0,
         .graph = 0,
         .source_file = NULL,
         .output_file = NULL,
@@ -116,9 +106,8 @@ int main(int argc, char **argv) {
         serialize_ast_out = fout;
         eval_ast_statement = serialize_ast;
     } else {
-        interpret_ast_out = fout;
-        eval_ast_statement = interpret_ast;
-        initialize_interpreter();
+        translate_ast_out = fout;
+        eval_ast_statement = translate_ast;
     }
 
     fprintf(stderr, "simple calc program\n");
