@@ -16,9 +16,9 @@ struct args {
     char *output_file;
 };
 
-const char *argp_program_version = "simplecalc";
-static char doc[] = "simple calculator program";
-static char args_doc[] = "<sourcefile>\n-i|--stdin";
+const char *argp_program_version = "0.1";
+static char doc[] = "Robot Instruction Compiler";
+static char args_doc[] = "<source>\n-i|--stdin";
 
 #define ARG_GROUP(name, group) {0, 0, NULL, 0, name, group}
 static struct argp_option options[] = {
@@ -110,7 +110,7 @@ int main(int argc, char **argv) {
         eval_ast_statement = translate_ast;
     }
 
-    fprintf(stderr, "simple calc program\n");
+    fprintf(stderr, "robins\n");
 
     int yycode = yyparse();
 
