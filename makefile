@@ -13,16 +13,14 @@ scripts_dir := scripts
 # sources and headers
 lexer               := $(src_dir)/frontend/lexer.l
 parser              := $(src_dir)/frontend/parser.y
-lex_i               := $(lexer:.l=.i)
-yacc_i              := $(parser:.y=.i)
 lex_c               := $(lexer:.l=.c)
 yacc_c              := $(parser:.y=.c)
 yacc_h              := $(parser:.y=.h)
 lexyacc_sources     := $(lex_c) $(yacc_c)
-lexyacc_genfiles    := $(lex_i) $(yacc_i) $(lexyacc_sources) $(yacc_h)
+lexyacc_genfiles    := $(lexyacc_sources) $(yacc_h)
 
 sources     := $(filter-out $(lexyacc_sources), $(shell find $(src_dir) -name '*.c'))
-headers     := $(shell find $(include_dir) -name '*.h')
+headers     := $(shell find $(include) -name '*.h')
 
 # objects
 objs            := $(sources:.c=.o)
@@ -45,9 +43,9 @@ endif
 #lexyacc flags
 LEX             := flex
 YACC            := bison
-LEXYACC_CFLAGS  :=
-LEXFLAGS        ?=
-YACCFLAGS       ?=
+LEXYACC_CFLAGS  := -I$(include_dir)
+LEXFLAGS        :=
+YACCFLAGS       :=
 
 CLANGDB   := compile_commands.json
 
@@ -89,15 +87,10 @@ $(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
 %.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-$(lex_i): $(lexer) $(yacc_h)
-	@$(CPP) $(cppflags) $(lexer) -o $(lex_i)
-$(yacc_i): $(parser)
-	@$(CPP) $(cppflags) $(parser) -o $(yacc_i)
-
-$(lex_c): $(lex_i)
-	@$(LEX) $(LEXFLAGS) --outfile="$(lex_c)" -- $(lex_i)
-$(yacc_c) $(yacc_h): $(yacc_i)
-	@$(YACC) $(YACCFLAGS) --output="$(yacc_c)" --header="$(yacc_h)" -- $(yacc_i)
+$(lex_c): $(lexer) $(yacc_h)
+	$(LEX) $(LEXFLAGS) --outfile="$(lex_c)" -- $(lexer)
+$(yacc_c) $(yacc_h): $(parser)
+	$(YACC) $(YACCFLAGS) --output="$(yacc_c)" --header="$(yacc_h)" -- $(parser)
 
 # $(lexyacc_objs): $(lex_c) $(yacc_c)
 $(lexyacc_objs): %.o: %.c

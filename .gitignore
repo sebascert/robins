@@ -12,6 +12,7 @@ lexer.i
 parser.i
 lexer.c
 parser.c
+parser.h
 
 # c
 *.o

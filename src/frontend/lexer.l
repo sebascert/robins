@@ -1,6 +1,4 @@
 %{
-// this is needed to avoid double defs from stdio imported in ast/literal.h
-#define _STDIO_H
 #include "ast/node.h"
 #include "parser.h"
 
