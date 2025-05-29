@@ -82,7 +82,7 @@ clangdb: clean-clangdb
 
 # compilation rules
 $(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
-	@$(CC) $(CFLAGS) $(CLINK) $^ -o $@
+	$(CC) $(CFLAGS) $(CLINK) $^ -o $@
 
 %.o: %.c
 	@$(CC) $(CFLAGS) -c $< -o $@
@@ -94,7 +94,7 @@ $(yacc_c) $(yacc_h): $(parser)
 
 # $(lexyacc_objs): $(lex_c) $(yacc_c)
 $(lexyacc_objs): %.o: %.c
-	$(CC) $(LEXYACC_CFLAGS) -c $< -o $@
+	@$(CC) $(LEXYACC_CFLAGS) -c $< -o $@
 
 $(CLANGDB):
 	@$(MAKE) clean
