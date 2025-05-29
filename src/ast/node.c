@@ -6,7 +6,8 @@
 #include <string.h>
 
 const char *astnode_t_names[] = {
-    [ASTNODE_T_OPERATION] = "op",
+    [ASTNODE_T_STATEMENT] = "stmt", [ASTNODE_T_INSTRUCTION] = "ins",
+    [ASTNODE_T_ARGUMENT] = "arg",   [ASTNODE_T_OPERATION] = "op",
     [ASTNODE_T_LITERAL] = "lit",
 };
 
@@ -65,9 +66,10 @@ struct astnode *push_stmt(struct astnode *first_ins)
     }
 
     node->stmt.n_ins = STMT_INIT_INS_SIZE;
+    node->stmt.ins_vec_size = STMT_INIT_INS_SIZE;
     node->stmt.instructions[0] = first_ins;
 
-    node->type = ASTNODE_T_INSTRUCTION;
+    node->type = ASTNODE_T_STATEMENT;
     return node;
 }
 
@@ -77,7 +79,7 @@ struct astnode *stmt_append_ins(struct astnode *stmt, struct astnode *ins)
     if (stmt->stmt.n_ins == stmt->stmt.ins_vec_size) {
         size_t next_size = stmt->stmt.ins_vec_size * 2;
         instructions =
-            realloc(instructions, sizeof(struct astnode) * next_size);
+            realloc(instructions, sizeof(struct astnode *) * next_size);
         if (!instructions) {
             yyerror("unable to allocate memory for AST nodes");
             return NULL;
@@ -87,8 +89,8 @@ struct astnode *stmt_append_ins(struct astnode *stmt, struct astnode *ins)
         stmt->stmt.instructions = instructions;
     }
 
-    stmt->stmt.n_ins++;
     instructions[stmt->stmt.n_ins] = ins;
+    stmt->stmt.n_ins++;
     return stmt;
 }
 
@@ -100,8 +102,8 @@ struct astnode *push_ins(instruction_t ins, size_t n_args, ...)
         return NULL;
     }
 
-    node->op.operands = malloc(sizeof(struct astnode *) * n_args);
-    if (!node->op.operands) {
+    node->ins.args = malloc(sizeof(struct astnode *) * n_args);
+    if (!node->ins.args) {
         free(node);
         yyerror("unable to allocate memory for AST nodes");
         return NULL;

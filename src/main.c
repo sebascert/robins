@@ -20,10 +20,7 @@ const char *argp_program_version = "0.1";
 static char doc[] = "Robot Instruction Compiler";
 static char args_doc[] = "<source>\n-i|--stdin";
 
-#define ARG_GROUP(name, group)     \
-    {                              \
-        0, 0, NULL, 0, name, group \
-    }
+#define ARG_GROUP(name, group) {0, 0, NULL, 0, name, group}
 static struct argp_option options[] = {
     ARG_GROUP("io:", 1),
     {"stdin", 'i', NULL, 0, "input from stdin instead of <sourcefile>", 1},

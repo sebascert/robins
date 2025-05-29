@@ -4,7 +4,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#define INS_ROTATE ' '
 %}
 
 %union {
@@ -51,7 +50,7 @@ full_stmt:
 
 stmt:
     instruction                 { $$ = push_stmt($1); }
-|   instruction INS_CONJUNCTION stmt    { $$ = stmt_append_ins($3, $1); }
+|   stmt INS_CONJUNCTION instruction    { $$ = stmt_append_ins($1, $3); }
 ;
 
 /* instructions */
@@ -65,7 +64,7 @@ ins_rotate: /* macroized */
 
 /* arguments */
 arg_degrees: /* macroized */
-    num_expr ARG_DEGREES_UNIT   { $$ = $1; }
+    num_expr ARG_DEGREES_UNIT   { $$ = push_arg(ARG_DEGREES, $1); }
 ;
 
 /* arithmetic */

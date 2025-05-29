@@ -36,7 +36,7 @@ void free_node(struct astnode *node);
 // correct, no incorrect or unexpected situation should arise
 
 struct astnode *push_stmt(struct astnode *first_ins);
-struct astnode *stmt_append_ins(struct astnode *ins_list, struct astnode *ins);
+struct astnode *stmt_append_ins(struct astnode *stmt, struct astnode *ins);
 
 // parsed instructions and arguments should be handled equally for any user
 // defined one, except for semantic validation.
