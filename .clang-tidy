@@ -1,0 +1,43 @@
+Checks: >
+  -*,
+  clang-analyzer-*,
+  clang-diagnostic-*,
+  linuxkernel-*,
+  portability-*,
+  performance-*,
+# bugprone-*,
+# readability-*,
+
+WarningsAsErrors: true
+HeaderFilterRegex: '.*'
+
+FormatStyle: file
+
+CheckOptions:
+  - key:             readability-function-size.LineThreshold
+    value:           '80'
+  # Functions, variables, parameters
+  - key:             readability-identifier-naming.FunctionCase
+    value:           lower_case
+  - key:             readability-identifier-naming.VariableCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ParameterCase
+    value:           lower_case
+
+  # Constants
+  - key:             readability-identifier-naming.ConstantCase
+    value:           UPPER_CASE
+
+  # Macros
+  - key:             readability-identifier-naming.MacroDefinitionCase
+    value:           UPPER_CASE
+
+  # Macros with args
+  - key:             readability-identifier-naming.MacroDefinitionIgnoredRegexp
+    value:           '^[A-Z_][A-Z0-9_]*\([^\)]'  # ignore function-like macros
+
+  # Structs, typedefs, enums
+  - key:             readability-identifier-naming.TypeCase
+    value:           lower_case
+  - key:             readability-identifier-naming.EnumConstantCase
+    value:           UPPER_CASE

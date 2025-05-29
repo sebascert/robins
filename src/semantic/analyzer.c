@@ -1,10 +1,12 @@
 #include "semantic/analyzer.h"
+
 #include "frontend/yyshared.h"
 
 #include <stdarg.h>
 #include <stdio.h>
 
-void sserror(const char *s, ...) {
+void sserror(const char *s, ...)
+{
     va_list args;
 
     va_start(args, s);

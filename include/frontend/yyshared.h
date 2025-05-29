@@ -1,9 +1,9 @@
 #ifndef FRONTEND_YYSHARED_H
 #define FRONTEND_YYSHARED_H
 
-#include <stdio.h>
-
 #include "ast/node.h"
+
+#include <stdio.h>
 
 extern int yylineno;
 extern char *yyfilename;

@@ -1,10 +1,10 @@
 #ifndef AST_NODE_H
 #define AST_NODE_H
 
-#include <stddef.h>
-
 #include "ast/literal.h"
 #include "ast/operation.h"
+
+#include <stddef.h>
 
 extern const char *astnode_t_names[];
 

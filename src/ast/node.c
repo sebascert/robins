@@ -10,27 +10,29 @@ const char *astnode_t_names[] = {
     [ASTNODE_T_LITERAL] = "lit",
 };
 
-void free_node(struct astnode *node) {
+void free_node(struct astnode *node)
+{
     if (!node) {
         yyerror("free_node received null node");
         return;
     }
 
     switch (node->type) {
-    case ASTNODE_T_OPERATION:
-        for (size_t i = 0; i < node->op.n_operands; i++) {
-            free_node(node->op.operands[i]);
-        }
-        free(node->op.operands);
-        free(node);
-        break;
-    case ASTNODE_T_LITERAL:
-        free(node);
-        break;
+        case ASTNODE_T_OPERATION:
+            for (size_t i = 0; i < node->op.n_operands; i++) {
+                free_node(node->op.operands[i]);
+            }
+            free(node->op.operands);
+            free(node);
+            break;
+        case ASTNODE_T_LITERAL:
+            free(node);
+            break;
     }
 }
 
-struct astnode *push_op(operation_t op, size_t n_operands, ...) {
+struct astnode *push_op(operation_t op, size_t n_operands, ...)
+{
     struct astnode *node = malloc(sizeof(struct astnode));
     if (!node) {
         yyerror("unable to allocate memory for AST nodes");
@@ -58,7 +60,8 @@ struct astnode *push_op(operation_t op, size_t n_operands, ...) {
     return node;
 }
 
-struct astnode *push_literal(literal_t type, union literal_v val) {
+struct astnode *push_literal(literal_t type, union literal_v val)
+{
     struct astnode *node = malloc(sizeof(struct astnode));
     if (!node) {
         yyerror("unable to allocate memory for AST nodes");

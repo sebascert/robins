@@ -12,15 +12,16 @@ struct literal NULL_LITERAL = {
     .val = {0},
 };
 
-int print_lit(const struct literal *lit, FILE *fout) {
+int print_lit(const struct literal *lit, FILE *fout)
+{
     switch (lit->type) {
-    case LITERAL_T_INT:
-        fprintf(fout, "%d", lit->val.ival);
-        return 0;
-    case LITERAL_T_REAL:
-        fprintf(fout, "%.2f", lit->val.rval);
-        return 0;
-    default:
-        return 1;
+        case LITERAL_T_INT:
+            fprintf(fout, "%d", lit->val.ival);
+            return 0;
+        case LITERAL_T_REAL:
+            fprintf(fout, "%.2f", lit->val.rval);
+            return 0;
+        default:
+            return 1;
     }
 }
