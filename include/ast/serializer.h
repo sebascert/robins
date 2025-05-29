@@ -8,7 +8,7 @@
 // output file of serialize_ast
 extern FILE *serialize_ast_out;
 
-// serialize ast into graphviz representation
+// serialize AST into graphviz representation
 void serialize_ast(const struct astnode *ast);
 
 #endif /* ifndef AST_SERIALIZER_H */
