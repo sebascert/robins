@@ -18,7 +18,7 @@
 %token INS_CONJUNCTION
 
 /* INSTRUCTION */
-%type <nptr> stmt instruction
+%type <nptr> stmt ins any_ins
 /* instruction tokens and type decl */
 %token INS_ROTATE_VERB /* macroized */
 %type <nptr> ins_rotate /* macroized */
@@ -44,18 +44,22 @@ statement_list:
 ;
 
 full_stmt:
-    NOUN stmt '.'               { eval_ast_statement($2); free_node($2); } /* macroized */
-|   NOUN POLITE_WORDS stmt '.'  { eval_ast_statement($3); free_node($3); } /* macroized */
+    NOUN stmt '.'               { eval_ast_statement($2); free_node($2); }
 ;
 
 stmt:
-    instruction                 { $$ = push_stmt($1); }
-|   stmt INS_CONJUNCTION instruction    { $$ = stmt_append_ins($1, $3); }
+    ins                         { $$ = push_stmt($1); }
+|   stmt INS_CONJUNCTION ins    { $$ = stmt_append_ins($1, $3); }
 ;
 
 /* instructions */
-instruction:
-    ins_rotate                  { $$ = $1;} /* macroized */
+ins: /* unpolite, polite, or both modes could be supported */
+    any_ins                     { $$ = $1; } /* macroized */
+|   POLITE_WORDS any_ins        { $$ = $2; } /* macroized */
+;
+
+any_ins:
+    ins_rotate                  { $$ = $1; } /* macroized */
 ;
 
 ins_rotate: /* macroized */
