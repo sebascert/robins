@@ -13,13 +13,13 @@
 }
 
 /* STATEMENT */
-/* statement structural lexemas */
+/* full_stmt structural lexemas */
 %token NOUN
 %token POLITE_WORDS
 %token INS_CONJUNCTION
 
 /* INSTRUCTION */
-%type <nptr> instruction_list instruction
+%type <nptr> stmt instruction
 /* instruction tokens and type decl */
 %token INS_ROTATE_VERB /* macroized */
 %type <nptr> ins_rotate /* macroized */
@@ -36,22 +36,22 @@
 %type <nptr> num_expr term factor
 
 %%
-/* statement */
+/* full_stmt */
 statement_list:
     /* epsilon */               { exit(0); }
 |   '.' statement_list
 |   error '.' statement_list    { yyerrok; }
-|   statement statement_list
+|   full_stmt statement_list
 ;
 
-statement:
-    NOUN instruction_list '.'   { eval_ast_statement($2); free_node($2); }
-    NOUN POLITE_WORDS instruction_list '.'  { eval_ast_statement($2); free_node($2); }
+full_stmt:
+    NOUN stmt '.'               { eval_ast_statement($2); free_node($2); } /* macroized */
+|   NOUN POLITE_WORDS stmt '.'  { eval_ast_statement($3); free_node($3); } /* macroized */
 ;
 
-instruction_list:
-    instruction                 { $$ = push_ins_list($1); }
-|   instruction INS_CONJUNCTION instruction_list    { $$ = append_ins($3, $1); }
+stmt:
+    instruction                 { $$ = push_stmt($1); }
+|   instruction INS_CONJUNCTION stmt    { $$ = stmt_append_ins($3, $1); }
 ;
 
 /* instructions */
@@ -60,7 +60,7 @@ instruction:
 ;
 
 ins_rotate: /* macroized */
-    INS_ROTATE_VERB arg_degrees { $$ = push_ins(INS_ROTATE, $2); }
+    INS_ROTATE_VERB arg_degrees { $$ = push_ins(INS_ROTATE, 1, $2); }
 ;
 
 /* arguments */
