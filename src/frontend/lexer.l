@@ -13,17 +13,38 @@ _alpha      [_A-Za-z]
 _alphanum   [_A-Za-z0-9]
 
 %%
+ /* INSTRUCTION LEXEMAS */
+    /* robot noun (statement prefix) */
+"Robot"                         { return NOUN; } /* macroized */
+"robot"                         { return NOUN; } /* macroized */
+    /* statement polite words */
+"please"                        { return POLITE_WORDS; } /* macroized */
+"would you please"              { return POLITE_WORDS; } /* macroized */
+    /* instruction conjunction */
+", and then"                    { return INS_CONJUNCTION; } /* macroized */
+", then"                        { return INS_CONJUNCTION; } /* macroized */
+    /* instruction verbs */
+"rotate"                        { return INS_ROTATE_VERB; } /* macroized */
+    /* argument units */
+"deg"                           { return ARG_DEGREES_UNIT; } /* macroized */
+    /* statement terminator */
+\.                              { return '.'; }
+
+ /* ARITHMETIC LEXEMAS */
     /* operators */
 [-+*/()]                        { return *yytext; }
     /* literals */
 {num}+                          { yylval.lval.ival = atoi(yytext);  return INT_L; }
 (\.{num}+|{num}+\.{num}*)       { yylval.lval.rval = strtof(yytext, NULL);  return REAL_L; }
-    /* ignores */
-\/\/.*                          ; /* ignore comments */
-[ \t]                           ; /* ignore whitespace */
-    /* statement terminator */
-\n                              { yylineno++; return '\n'; }
-    /* lexical error */
+
+ /* LEXICAL IGNORES */
+    /* ignore comments */
+\/\/.*                          { yylineno++; }
+    /* ignore whitespace */
+\n                              { yylineno++; }
+[ \t]                         ;
+
+ /* LEXICAL ERROR */
 .  {
     lex_err[25] = *yytext;
     yyerror(lex_err);
@@ -31,6 +52,6 @@ _alphanum   [_A-Za-z0-9]
     int c;
     while ((c = input()) != '\n' && c != EOF) ;
     yylineno++;
-    return '\n';
+    return '.';
 }
 %%
