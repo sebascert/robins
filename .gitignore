@@ -18,6 +18,10 @@ parser.h
 *.o
 *.out
 
+# cores
+core.*
+vgcore.*
+
 # graphviz
 *.dot
 *.png
