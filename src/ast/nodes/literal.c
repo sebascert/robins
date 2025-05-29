@@ -1,4 +1,4 @@
-#include "ast/literal.h"
+#include "ast/nodes/literal.h"
 
 #include <stdio.h>
 

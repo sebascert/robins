@@ -1,6 +1,5 @@
 #include "backend/translator.h"
 
-#include "ast/literal.h"
 #include "ast/node.h"
 #include "backend/expr_eval.h"
 #include "semantic/analyzer.h"

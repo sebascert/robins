@@ -1,5 +1,5 @@
-#ifndef AST_STATEMENT_H
-#define AST_STATEMENT_H
+#ifndef AST_NODES_STATEMENT_H
+#define AST_NODES_STATEMENT_H
 
 #include <stddef.h>
 
@@ -12,4 +12,4 @@ struct statement {
     struct astnode** instructions;
 };
 
-#endif /* ifndef AST_STATEMENT_H */
+#endif /* ifndef AST_NODES_STATEMENT_H */

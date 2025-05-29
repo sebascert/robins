@@ -1,5 +1,5 @@
-#ifndef AST_ARGUMENT_H
-#define AST_ARGUMENT_H
+#ifndef AST_NODES_ARGUMENT_H
+#define AST_NODES_ARGUMENT_H
 
 extern const char *const argument_t_names[];
 
@@ -13,4 +13,4 @@ struct argument {
     struct astnode *resolution;
 };
 
-#endif /* ifndef AST_ARGUMENT_H */
+#endif /* ifndef AST_NODES_ARGUMENT_H */

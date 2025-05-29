@@ -1,5 +1,5 @@
-#ifndef AST_INSTRUCTION_H
-#define AST_INSTRUCTION_H
+#ifndef AST_NODES_INSTRUCTION_H
+#define AST_NODES_INSTRUCTION_H
 
 #include <stddef.h>
 
@@ -16,4 +16,4 @@ struct instruction {
     struct astnode **args;
 };
 
-#endif /* ifndef AST_INSTRUCTION_H */
+#endif /* ifndef AST_NODES_INSTRUCTION_H */

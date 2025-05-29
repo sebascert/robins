@@ -1,5 +1,5 @@
-#ifndef AST_OPERATION_H
-#define AST_OPERATION_H
+#ifndef AST_NODES_OPERATION_H
+#define AST_NODES_OPERATION_H
 
 #include <stddef.h>
 
@@ -19,4 +19,4 @@ struct operation {
     struct astnode **operands;
 };
 
-#endif /* ifndef AST_OPERATION_H */
+#endif /* ifndef AST_NODES_OPERATION_H */

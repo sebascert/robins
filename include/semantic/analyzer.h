@@ -1,8 +1,8 @@
 #ifndef SEMANTIC_ANALYZER_H
 #define SEMANTIC_ANALYZER_H
 
-#include "ast/argument.h"
-#include "ast/literal.h"
+#include "ast/nodes/argument.h"
+#include "ast/nodes/literal.h"
 
 #include <stdbool.h>
 

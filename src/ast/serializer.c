@@ -1,6 +1,5 @@
 #include "ast/serializer.h"
 
-#include "ast/literal.h"
 #include "ast/node.h"
 
 #include <errno.h>

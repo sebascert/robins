@@ -1,7 +1,7 @@
 #ifndef BACKEND_EXPR_EVAL_H
 #define BACKEND_EXPR_EVAL_H
 
-#include "ast/literal.h"
+#include "ast/nodes/literal.h"
 
 int cast_lit(struct literal *lit, literal_t cast);
 union literal_v literal_default(literal_t type);

@@ -1,4 +1,4 @@
-#include "ast/operation.h"
+#include "ast/nodes/operation.h"
 
 const char *const operation_t_names[] = {
     [OPERATION_T_ADD] = "+",

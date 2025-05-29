@@ -1,11 +1,11 @@
 #ifndef AST_NODE_H
 #define AST_NODE_H
 
-#include "ast/argument.h"
-#include "ast/instruction.h"
-#include "ast/literal.h"
-#include "ast/operation.h"
-#include "ast/statement.h"
+#include "ast/nodes/argument.h"
+#include "ast/nodes/instruction.h"
+#include "ast/nodes/literal.h"
+#include "ast/nodes/operation.h"
+#include "ast/nodes/statement.h"
 
 #include <stddef.h>
 
