@@ -1,5 +1,5 @@
-#ifndef AST_LITERAL_H
-#define AST_LITERAL_H
+#ifndef AST_NODES_LITERAL_H
+#define AST_NODES_LITERAL_H
 
 #include <stdio.h>
 
@@ -25,4 +25,4 @@ extern struct literal NULL_LITERAL;
 
 int print_lit(const struct literal *lit, FILE *fout);
 
-#endif /* ifndef AST_LITERAL_H */
+#endif /* ifndef AST_NODES_LITERAL_H */

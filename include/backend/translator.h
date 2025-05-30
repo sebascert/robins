@@ -9,7 +9,7 @@
 // output file of translate_ast
 extern FILE *translate_ast_out;
 
-// translate abstract syntax tree
+// translate AST to target
 void translate_ast(const struct astnode *ast);
 
 #endif /* ifndef BACKEND_TRANSLATOR_H */

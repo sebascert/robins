@@ -1,108 +1,66 @@
 #include "backend/translator.h"
 
-#include "ast/literal.h"
 #include "ast/node.h"
 #include "backend/expr_eval.h"
 #include "semantic/analyzer.h"
 
 #include <stdio.h>
 
-// operations
-struct literal op_unary_arithmetic(const struct operation *node, FILE *fout);
-struct literal op_binary_arithmetic(const struct operation *node, FILE *fout);
+#define INVALID_AST 1
+#define SEMANTIC_ERROR 2
 
-struct literal translate_ast_node(const struct astnode *node, FILE *fout)
+int translate_ast_node(const struct astnode *node, FILE *fout)
 {
     if (!node)
-        return NULL_LITERAL;
+        return INVALID_AST;
 
     switch (node->type) {
-        case ASTNODE_T_LITERAL:
-            return node->lit;
-        case ASTNODE_T_OPERATION:
-            switch (node->op.type) {
-                /* arithmetic */
-                case '-':
-                    if (node->op.n_operands == 1) {
-                        goto unary;
-                    }
-                    goto binary;
-                case '+':
-                case '*':
-                case '/':
-                binary:
-                    if (node->op.n_operands != 2) {
-                        sserror("binary arithmetic expects 2 operands");
-                        return NULL_LITERAL;
-                    }
-                    return op_binary_arithmetic(&node->op, fout);
-                unary:
-                    if (node->op.n_operands != 1) {
-                        sserror("unary arithmetic expects 1 operand");
-                        return NULL_LITERAL;
-                    }
-                    return op_unary_arithmetic(&node->op, fout);
-                default:
-                    sserror("invalid operand\n");
-                    return NULL_LITERAL;
+        case ASTNODE_T_STATEMENT:
+            for (size_t i = 0; i < node->stmt.n_ins; i++) {
+                struct astnode *instruction = node->stmt.instructions[i];
+                int status = translate_ast_node(instruction, fout);
+                if (status != 0)
+                    return status;
             }
+            break;
+
+        case ASTNODE_T_INSTRUCTION:
+            fprintf(fout, "%s", instruction_t_mnemonics[node->ins.type]);
+            for (size_t i = 0; i < node->ins.n_args; i++) {
+                int status = translate_ast_node(node->ins.args[i], fout);
+                if (status != 0)
+                    return status;
+            }
+            fprintf(fout, "\n");
+            break;
+
+        case ASTNODE_T_ARGUMENT: {
+            struct literal evaluated = expr_eval(node->arg.resolution);
+            if (evaluated.type == LITERAL_T_NULL)
+                return INVALID_AST;
+
+            if (!arg_semantic_validate(node->arg.type, &evaluated)) {
+                fprintf(stderr, "Halted translation due to semantic error\n");
+                return SEMANTIC_ERROR;
+            }
+
+            fprintf(fout, " ");
+            print_lit(&evaluated, fout);
+            break;
+        }
+
+        case ASTNODE_T_OPERATION:;
+        case ASTNODE_T_LITERAL:
         default:
-            sserror("invalid node type\n");
-            return NULL_LITERAL;
+            return INVALID_AST;
     }
+    return 0;
 }
 
 FILE *translate_ast_out;
 void translate_ast(const struct astnode *ast)
 {
-    if (!ast) {
-        sserror("translate_ast: null ast\n");
-        return;
-    }
-
-    struct literal result = translate_ast_node(ast, translate_ast_out);
-
-    // print the result of an expression if not null
-    if (result.type == LITERAL_T_NULL)
-        return;
-
-    fprintf(translate_ast_out, "= ");
-    print_lit(&result, translate_ast_out);
-    fprintf(translate_ast_out, "\n");
-}
-
-struct literal op_unary_arithmetic(const struct operation *node, FILE *fout)
-{
-    struct literal a;
-    a = translate_ast_node(node->operands[0], fout);
-    switch (node->type) {
-        case '-':
-            return negate_lit(a);
-        default:
-            return NULL_LITERAL;
-    }
-}
-
-struct literal op_binary_arithmetic(const struct operation *node, FILE *fout)
-{
-    struct literal a, b, result;
-    a = translate_ast_node(node->operands[0], fout);
-    b = translate_ast_node(node->operands[1], fout);
-
-    switch (node->type) {
-        case '-':
-            return sub_lit(a, b);
-        case '+':
-            return add_lit(a, b);
-        case '*':
-            return mul_lit(a, b);
-        case '/':
-            result = div_lit(a, b);
-            if (result.type == LITERAL_T_NULL)
-                sserror("division by zero\n");
-
-            return result;
-        default:
-            return NULL_LITERAL;
+    if (translate_ast_node(ast, translate_ast_out) == INVALID_AST) {
+        fprintf(stderr, "attempting to translate invalid AST\n");
     }
 }
