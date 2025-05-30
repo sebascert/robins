@@ -5,6 +5,7 @@ extern const char *const argument_t_names[];
 
 typedef enum {
     ARG_DEGREES, /* macroized */
+    ARG_BLOCKS,  /* macroized */
 } argument_t;
 
 struct astnode;

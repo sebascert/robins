@@ -14,5 +14,6 @@ bool arg_semantic_validate(argument_t type, struct literal* evaluated_arg);
 extern const literal_t arg_types[];
 
 bool arg_sv_degrees(int value); /* macroized */
+bool arg_sv_blocks(int value);  /* macroized */
 
 #endif /* ifndef SEMANTIC_ANALYZER_H */

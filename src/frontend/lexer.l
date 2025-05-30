@@ -25,8 +25,10 @@ _alphanum   [_A-Za-z0-9]
 ", then"                        { return INS_CONJUNCTION; } /* macroized */
     /* instruction verbs */
 "rotate"                        { return INS_ROTATE_VERB; } /* macroized */
+"move"                          { return INS_MOVE_VERB; } /* macroized */
     /* argument units */
 "deg"                           { return ARG_DEGREES_UNIT; } /* macroized */
+"blocks"                        { return ARG_BLOCKS_UNIT; } /* macroized */
     /* statement terminator */
 \.                              { return '.'; }
 

@@ -21,10 +21,14 @@
 %type <nptr> stmt ins any_ins
 /* instruction tokens and type decl */
 %token INS_ROTATE_VERB /* macroized */
+%token INS_MOVE_VERB /* macroized */
 %type <nptr> ins_rotate /* macroized */
+%type <nptr> ins_move /* macroized */
 /* argument tokens and type decl */
 %token ARG_DEGREES_UNIT /* macroized */
+%token ARG_BLOCKS_UNIT /* macroized */
 %type <nptr> arg_degrees /* macroized */
+%type <nptr> arg_blocks /* macroized */
 
 /* ARITHMETIC */
 /* literals */
@@ -60,15 +64,22 @@ ins: /* unpolite, polite, or both modes could be supported */
 
 any_ins:
     ins_rotate                  { $$ = $1; } /* macroized */
+|   ins_move                    { $$ = $1; } /* macroized */
 ;
 
 ins_rotate: /* macroized */
     INS_ROTATE_VERB arg_degrees { $$ = push_ins(INS_ROTATE, 1, $2); }
 ;
+ins_move: /* macroized */
+    INS_MOVE_VERB arg_blocks { $$ = push_ins(INS_MOVE, 1, $2); }
+;
 
 /* arguments */
 arg_degrees: /* macroized */
     num_expr ARG_DEGREES_UNIT   { $$ = push_arg(ARG_DEGREES, $1); }
+;
+arg_blocks: /* macroized */
+    num_expr ARG_BLOCKS_UNIT   { $$ = push_arg(ARG_BLOCKS, $1); }
 ;
 
 /* arithmetic */
