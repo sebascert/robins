@@ -39,8 +39,10 @@ int translate_ast_node(const struct astnode *node, FILE *fout)
             if (evaluated.type == LITERAL_T_NULL)
                 return INVALID_AST;
 
-            if (!arg_semantic_validate(node->arg.type, evaluated))
+            if (!arg_semantic_validate(node->arg.type, &evaluated)) {
+                fprintf(stderr, "Halted translation due to semantic error\n");
                 return SEMANTIC_ERROR;
+            }
 
             fprintf(fout, " ");
             print_lit(&evaluated, fout);

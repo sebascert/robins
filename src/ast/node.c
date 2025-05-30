@@ -65,9 +65,9 @@ struct astnode *push_stmt(struct astnode *first_ins)
         return NULL;
     }
 
-    node->stmt.n_ins = STMT_INIT_INS_SIZE;
-    node->stmt.ins_vec_size = STMT_INIT_INS_SIZE;
+    node->stmt.n_ins = 1;
     node->stmt.instructions[0] = first_ins;
+    node->stmt.ins_vec_size = STMT_INIT_INS_SIZE;
 
     node->type = ASTNODE_T_STATEMENT;
     return node;

@@ -25,7 +25,7 @@ size_t serialize_ast_nodes(const struct astnode *node, FILE *fout)
         case ASTNODE_T_STATEMENT:
             node_id = curr_id[ASTNODE_T_STATEMENT]++;
             label = "stmt";
-            for (size_t i = 0; i < node->stmt.ins_vec_size; i++) {
+            for (size_t i = 0; i < node->stmt.n_ins; i++) {
                 struct astnode *instruction = node->stmt.instructions[i];
                 size_t instruction_node_id =
                     serialize_ast_nodes(instruction, fout);
