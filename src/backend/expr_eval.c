@@ -1,7 +1,7 @@
 #include "backend/expr_eval.h"
 
 #include "backend/arithmetic.h"
-#include "semantic/analyzer.h"
+#include "semantic/error.h"
 
 struct literal op_unary_arithmetic(const struct operation *node);
 struct literal op_binary_arithmetic(const struct operation *node);

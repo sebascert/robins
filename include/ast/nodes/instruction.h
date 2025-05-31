@@ -1,14 +1,9 @@
 #ifndef AST_NODES_INSTRUCTION_H
 #define AST_NODES_INSTRUCTION_H
 
+#include "ast/user_types.h"
+
 #include <stddef.h>
-
-extern const char *const instruction_t_mnemonics[];
-
-typedef enum {
-    INS_ROTATE, /* macroized */
-    INS_MOVE,   /* macroized */
-} instruction_t;
 
 struct astnode;
 struct instruction {
