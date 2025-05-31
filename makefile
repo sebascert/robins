@@ -4,11 +4,12 @@ args    ?=
 test    ?=
 
 # dirs
-src_dir     := src
-include_dir := include
-build_dir   := build
-tests_dir   := tests
-scripts_dir := scripts
+src_dir        := src
+include_dir    := include
+m4_include_dir := macros
+build_dir      := build
+tests_dir      := tests
+scripts_dir    := scripts
 
 # sources and headers
 lexer               := $(src_dir)/frontend/lexer.l
@@ -19,16 +20,20 @@ yacc_h              := $(parser:.y=.h)
 lexyacc_sources     := $(lex_c) $(yacc_c)
 lexyacc_genfiles    := $(lexyacc_sources) $(yacc_h)
 
+m4_sources  := $(patsubst %.c.m4, %.c, $(shell find $(src_dir) -name '*.c.m4'))
+m4_headers  := $(patsubst %.h.m4, %.h, $(shell find $(include_dir) -name '*.h.m4'))
+m4_genfiles := $(patsubst %.m4, %, $(shell find $(src_dir) $(include_dir) -name '*.m4'))
+
 sources     := $(filter-out $(lexyacc_sources), $(shell find $(src_dir) -name '*.c'))
-headers     := $(shell find $(include) -name '*.h')
+sources     += $(m4_sources)
+headers     := $(shell find $(include_dir) -name '*.h')
+headers     += $(m4_headers)
 
 # objects
 objs            := $(sources:.c=.o)
 lexyacc_objs    := $(lexyacc_sources:.c=.o)
 
 # compiler setup
-CPP         := cpp
-cppflags    := -P -I$(include_dir)
 CC          := gcc
 CSTD        := c99
 CLINK       := -lfl -ly
@@ -40,7 +45,11 @@ else
 	CFLAGS += -g
 endif
 
-#lexyacc flags
+# m4 setup
+M4          := m4
+M4FLAGS     := -I$(m4_include_dir)
+
+# lex and yacc flags
 LEX             := flex
 YACC            := bison
 LEXYACC_CFLAGS  := -I$(include_dir)
@@ -69,11 +78,11 @@ else
 	@./$(scripts_dir)/add-test.sh "$(realpath $(tests_dir))" "$(test)"
 endif
 
-format:
+format: $(headers) $(sources)
 	@clang-format -i $(headers) $(sources)
 
-lint: $(CLANGDB)
-	@clang-tidy $(headers) $(sources) -p .
+lint: $(CLANGDB) $(headers) $(sources)
+	@clang-tidy -p . $(headers) $(sources)
 
 clangdb: clean-clangdb
 	@$(MAKE) $(CLANGDB)
@@ -84,7 +93,7 @@ clangdb: clean-clangdb
 $(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
 	$(CC) $(CFLAGS) $(CLINK) $^ -o $@
 
-%.o: %.c
+%.o: %.c | $(headers)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(lex_c): $(lexer) $(yacc_h)
@@ -92,7 +101,6 @@ $(lex_c): $(lexer) $(yacc_h)
 $(yacc_c) $(yacc_h): $(parser)
 	$(YACC) $(YACCFLAGS) --output="$(yacc_c)" --header="$(yacc_h)" -- $(parser)
 
-# $(lexyacc_objs): $(lex_c) $(yacc_c)
 $(lexyacc_objs): %.o: %.c
 	@$(CC) $(LEXYACC_CFLAGS) -c $< -o $@
 
@@ -103,9 +111,24 @@ $(CLANGDB):
 $(build_dir):
 	@mkdir -p $(build_dir)
 
+# m4 macro processing
+
+%.c: %.c.m4
+	$(M4) $(M4FLAGS) $< > $@
+
+%.h: %.h.m4
+	$(M4) $(M4FLAGS) $< > $@
+
+%.l: %.l.m4
+	$(M4) $(M4FLAGS) $< > $@
+
+%.y: %.y.m4
+	$(M4) $(M4FLAGS) $< > $@
+
 # clean rules
 clean:
 	@rm -rf $(build_dir)
+	@rm -f $(m4_genfiles)
 	@rm -f $(lexyacc_genfiles)
 	@find . -name '*.o' -exec rm -f {} +
 
