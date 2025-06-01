@@ -8,14 +8,14 @@ int cast_lit(struct literal *lit, literal_t cast)
     switch (lit->type) {
         case LITERAL_T_INT:
             if (cast == LITERAL_T_REAL) {
-                lit->val.rval = (float)lit->val.ival;
+                lit->val.rval = (literal_t_real)lit->val.ival;
                 goto casted;
             }
             return 1;
 
         case LITERAL_T_REAL:
             if (cast == LITERAL_T_INT) {
-                lit->val.ival = (int)lit->val.rval;
+                lit->val.ival = (literal_t_int)lit->val.rval;
                 goto casted;
             }
             return 1;
@@ -59,8 +59,10 @@ struct literal negate_lit(struct literal a)
 struct literal add_lit(struct literal a, struct literal b)
 {
     if (a.type == LITERAL_T_REAL || b.type == LITERAL_T_REAL) {
-        float lhs = a.type == LITERAL_T_REAL ? a.val.rval : (float)a.val.ival;
-        float rhs = b.type == LITERAL_T_REAL ? b.val.rval : (float)b.val.ival;
+        literal_t_real lhs =
+            a.type == LITERAL_T_REAL ? a.val.rval : (literal_t_real)a.val.ival;
+        literal_t_real rhs =
+            b.type == LITERAL_T_REAL ? b.val.rval : (literal_t_real)b.val.ival;
         return (struct literal){LITERAL_T_REAL, .val.rval = lhs + rhs};
     } else {
         return (struct literal){LITERAL_T_INT,
@@ -71,8 +73,10 @@ struct literal add_lit(struct literal a, struct literal b)
 struct literal sub_lit(struct literal a, struct literal b)
 {
     if (a.type == LITERAL_T_REAL || b.type == LITERAL_T_REAL) {
-        float lhs = a.type == LITERAL_T_REAL ? a.val.rval : (float)a.val.ival;
-        float rhs = b.type == LITERAL_T_REAL ? b.val.rval : (float)b.val.ival;
+        literal_t_real lhs =
+            a.type == LITERAL_T_REAL ? a.val.rval : (literal_t_real)a.val.ival;
+        literal_t_real rhs =
+            b.type == LITERAL_T_REAL ? b.val.rval : (literal_t_real)b.val.ival;
         return (struct literal){LITERAL_T_REAL, .val.rval = lhs - rhs};
     } else {
         return (struct literal){LITERAL_T_INT,
@@ -83,8 +87,10 @@ struct literal sub_lit(struct literal a, struct literal b)
 struct literal mul_lit(struct literal a, struct literal b)
 {
     if (a.type == LITERAL_T_REAL || b.type == LITERAL_T_REAL) {
-        float lhs = a.type == LITERAL_T_REAL ? a.val.rval : (float)a.val.ival;
-        float rhs = b.type == LITERAL_T_REAL ? b.val.rval : (float)b.val.ival;
+        literal_t_real lhs =
+            a.type == LITERAL_T_REAL ? a.val.rval : (literal_t_real)a.val.ival;
+        literal_t_real rhs =
+            b.type == LITERAL_T_REAL ? b.val.rval : (literal_t_real)b.val.ival;
         return (struct literal){LITERAL_T_REAL, .val.rval = lhs * rhs};
     } else {
         return (struct literal){LITERAL_T_INT,
@@ -94,8 +100,10 @@ struct literal mul_lit(struct literal a, struct literal b)
 
 struct literal div_lit(struct literal a, struct literal b)
 {
-    float lhs = a.type == LITERAL_T_REAL ? a.val.rval : (float)a.val.ival;
-    float rhs = b.type == LITERAL_T_REAL ? b.val.rval : (float)b.val.ival;
+    literal_t_real lhs =
+        a.type == LITERAL_T_REAL ? a.val.rval : (literal_t_real)a.val.ival;
+    literal_t_real rhs =
+        b.type == LITERAL_T_REAL ? b.val.rval : (literal_t_real)b.val.ival;
 
     if (rhs == 0)
         return NULL_LITERAL;
