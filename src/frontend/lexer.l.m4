@@ -1,3 +1,4 @@
+include(`config.m4')dnl
 %{
 #include "ast/node.h"
 #include "frontend/yyshared.h"
@@ -15,20 +16,16 @@ _alphanum   [_A-Za-z0-9]
 %%
  /* INSTRUCTION LEXEMAS */
     /* robot noun (statement prefix) */
-"Robot"                         { return NOUN; } /* macroized */
-"robot"                         { return NOUN; } /* macroized */
+ROBINS_NOUN_LEXEMAS()
     /* statement polite words */
-"please"                        { return POLITE_WORDS; } /* macroized */
-"would you please"              { return POLITE_WORDS; } /* macroized */
-    /* instruction conjunction */
-", and then"                    { return INS_CONJUNCTION; } /* macroized */
-", then"                        { return INS_CONJUNCTION; } /* macroized */
+ROBINS_POLITE_WORDS_LEXEMAS()
+    /* instruction conjunction (may get macroized later) */
+", and then"                    { return INS_CONJUNCTION; }
+", then"                        { return INS_CONJUNCTION; }
     /* instruction verbs */
-"rotate"                        { return INS_ROTATE_VERB; } /* macroized */
-"move"                          { return INS_MOVE_VERB; } /* macroized */
+ROBINS_INS_VERB_LEXEMAS()
     /* argument units */
-"deg"                           { return ARG_DEGREES_UNIT; } /* macroized */
-"blocks"                        { return ARG_BLOCKS_UNIT; } /* macroized */
+ROBINS_ARG_UNIT_LEXEMAS()
     /* statement terminator */
 \.                              { return '.'; }
 
