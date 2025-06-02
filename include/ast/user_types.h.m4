@@ -1,4 +1,8 @@
 include(`config.m4')dnl
+ifdef(`ROBINS_INS_TYPES', , `errprint(`m4: ERROR: ROBINS_INS_TYPES is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_ARG_TYPES', , `errprint(`m4: ERROR: ROBINS_ARG_TYPES is not defined.')
+m4exit(1)')dnl
 #ifndef AST_USER_TYPES_H
 #define AST_USER_TYPES_H
 

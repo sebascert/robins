@@ -1,4 +1,16 @@
 include(`config.m4')dnl
+ifdef(`ROBINS_INS_GRAMMAR_MACROS', , `errprint(`m4: ERROR: ROBINS_INS_GRAMMAR_MACROS is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_ARG_GRAMMAR_MACROS', , `errprint(`m4: ERROR: ROBINS_ARG_GRAMMAR_MACROS is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_INS_GRAMMAR_RULE_STRUCTURE', , `errprint(`m4: ERROR: ROBINS_INS_GRAMMAR_RULE_STRUCTURE is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_INS_PARTIAL_GRAMMAR_RULE', , `errprint(`m4: ERROR: ROBINS_INS_PARTIAL_GRAMMAR_RULE is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_INS_GRAMMAR_RULES', , `errprint(`m4: ERROR: ROBINS_INS_GRAMMAR_RULES is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_ARG_GRAMMAR_RULES', , `errprint(`m4: ERROR: ROBINS_ARG_GRAMMAR_RULES is not defined.')
+m4exit(1)')dnl
 %{
 #include "ast/node.h"
 #include "frontend/yyshared.h"

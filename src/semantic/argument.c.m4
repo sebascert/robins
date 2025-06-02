@@ -1,4 +1,10 @@
 include(`config.m4')dnl
+ifdef(`ROBINS_ARG_TYPE_MAP', , `errprint(`m4: ERROR: ROBINS_ARG_TYPE_MAP is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_ARG_SV_DECL', , `errprint(`m4: ERROR: ROBINS_ARG_SV_DECL is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_ARG_SV_CASES', , `errprint(`m4: ERROR: ROBINS_ARG_SV_CASES is not defined.')
+m4exit(1)')dnl
 #include "semantic/argument.h"
 
 const literal_t arg_types[] = {
