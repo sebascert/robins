@@ -20,6 +20,7 @@ yacc_h              := $(parser:.y=.h)
 lexyacc_sources     := $(lex_c) $(yacc_c)
 lexyacc_genfiles    := $(lexyacc_sources) $(yacc_h)
 
+m4_macros   := $(shell find $(m4_include_dir) -name '*.m4')
 m4_sources  := $(patsubst %.c.m4, %.c, $(shell find $(src_dir) -name '*.c.m4'))
 m4_headers  := $(patsubst %.h.m4, %.h, $(shell find $(include_dir) -name '*.h.m4'))
 m4_genfiles := $(patsubst %.m4, %, $(shell find $(src_dir) $(include_dir) -name '*.m4'))
@@ -113,16 +114,16 @@ $(build_dir):
 
 # m4 macro processing
 
-%.c: %.c.m4
+%.c: %.c.m4 $(m4_macros)
 	$(M4) $(M4FLAGS) $< > $@
 
-%.h: %.h.m4
+%.h: %.h.m4 $(m4_macros)
 	$(M4) $(M4FLAGS) $< > $@
 
-%.l: %.l.m4
+%.l: %.l.m4 $(m4_macros)
 	$(M4) $(M4FLAGS) $< > $@
 
-%.y: %.y.m4
+%.y: %.y.m4 $(m4_macros)
 	$(M4) $(M4FLAGS) $< > $@
 
 # clean rules
