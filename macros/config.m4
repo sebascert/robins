@@ -1,102 +1,71 @@
 dnl ROBINS CONFIGURATION
 dnl
-dnl Add "dnl" at the end of every statement or empty line, as this improves
-dnl formatting in m4 generated files.
+dnl Add "dnl" at the end of every empty line, as this improves the formatting
+dnl of m4 generated files.
 dnl
-dnl parser macros
-define(`ROBINS_INS_GRAMMAR_MACROS',
-`%token INS_ROTATE_VERB
-%type <nptr> ins_rotate
-%token INS_MOVE_VERB
-%type <nptr> ins_move')dnl
+dnl READ THE INSTRUCTIONS CAREFULLY.
+dnl If you do not follow the instructions your program may not compile, or the
+dnl language recognized by it may be ambiguous.
 dnl
-define(`ROBINS_ARG_GRAMMAR_MACROS',
-`%token ARG_DEGREES_UNIT
-%type <nptr> arg_degrees
-%token ARG_BLOCKS_UNIT
-%type <nptr> arg_blocks')dnl
+dnl DO NOT REMOVE.
+dnl Includes for macro definitions.
+include(`defs/noun.m4')dnl
+include(`defs/politeness_level.m4')dnl
+include(`defs/instruction.m4')dnl
+include(`defs/argument.m4')dnl
 dnl
-define(`ROBINS_INS_GRAMMAR_RULE_STRUCTURE',
-   `partial_ins                 { $$ = `$'1; }
-|   POLITE_WORDS partial_ins    { $$ = `$'2; }')dnl
+dnl Nouns for the hypothetical robot. Words registered as nouns become reserved
+dnl words. Every valid statement must start with some noun.
 dnl
-define(`ROBINS_INS_PARTIAL_GRAMMAR_RULE',
-   `ins_rotate                  { $$ = `$'1; }
-|   ins_move                    { $$ = `$'1; }')dnl
+dnl ROBINS_NOUN(`noun')
+dnl nouns: string of noun.
 dnl
-define(`ROBINS_INS_GRAMMAR_RULES',
-`ins_rotate:
-    INS_ROTATE_VERB arg_degrees { $$ = push_ins(INS_ROTATE, 1, `$'2); }
-;
-ins_move:
-    INS_MOVE_VERB arg_blocks    { $$ = push_ins(INS_MOVE, 1, `$'2); }
-;')dnl
+ROBINS_NOUN(`robot')dnl
+ROBINS_NOUN(`Robot')dnl
 dnl
-define(`ROBINS_ARG_GRAMMAR_RULES',
-`arg_degrees:
-    num_expr ARG_DEGREES_UNIT   { $$ = push_arg(ARG_DEGREES, `$'1); }
-;
-arg_blocks:
-    num_expr ARG_BLOCKS_UNIT   { $$ = push_arg(ARG_BLOCKS, `$'1); }
-;')dnl
+dnl Politeness level of the language recognized.
 dnl
-dnl lexer macros
+dnl ROBINS_POLITENESS_LEVEL(level)
+dnl level: one of the following integers:
+dnl     (0) no polite words accepted.
+dnl     (1) both polite and not polite words accepted.
+dnl     (2) onlu polite words accepted.
 dnl
-define(`ROBINS_NOUN_LEXEMAS',
-`"Robot"                         { return NOUN; }
-"robot"                         { return NOUN; }')dnl
+ROBINS_POLITENESS_LEVEL(1)dnl
 dnl
-define(`ROBINS_POLITE_WORDS_LEXEMAS',
-`"please"                        { return POLITE_WORDS; }
-"would you please"              { return POLITE_WORDS; }')dnl
+dnl Argument Definitions.
 dnl
-define(`ROBINS_INS_VERB_LEXEMAS',
-`"rotate"                        { return INS_ROTATE_VERB; }
-"move"                          { return INS_MOVE_VERB; }')dnl
+dnl ROBINS_ARG(`arg_id', `type', `unit', `semantic_validation')
+dnl arg_id: argument identifier for referencing in other macros,
+dnl         must be a valid C variable name (otherwise undefined behaviour).
+dnl type: argument type, see valid types below.
+dnl unit: suffix words after the argument value.
+dnl semantic_validation: C function predicate receiving val of corresponding
+dnl                      argument type, returning false means the argument is
+dnl                      semantically rejected (without {}).
 dnl
-define(`ROBINS_ARG_UNIT_LEXEMAS',
-`"deg"                           { return ARG_DEGREES_UNIT; }
-"blocks"                        { return ARG_BLOCKS_UNIT; }')dnl
+dnl valid types:
+dnl - int: integer number, int C type.
+dnl - real: real number, double C type.
 dnl
-dnl AST macros
-dnl
-define(`ROBINS_INS_TYPES',
-   `INS_ROTATE,
-    INS_MOVE,')dnl
-dnl
-define(`ROBINS_ARG_TYPES',
-   `ARG_DEGREES,
-    ARG_BLOCKS,')dnl
-dnl
-define(`ROBINS_INS_MNEMONICS',
-   `[INS_ROTATE]= "rot",
-    [INS_MOVE] = "mov",')dnl
-dnl
-define(`ROBINS_ARG_TYPE_NAMES',
-   `[ARG_DEGREES] = "degrees",
-    [ARG_BLOCKS] = "blocks",')dnl
-dnl
-dnl semantic macros
-dnl
-define(`ROBINS_ARG_TYPE_MAP',
-   `[ARG_DEGREES] = LITERAL_T_INT,
-    [ARG_BLOCKS] = LITERAL_T_INT,')dnl
-dnl
-define(`ROBINS_ARG_SV_DECL',
-`bool arg_sv_degrees(int value)
-{
-    (void)value;
+ROBINS_ARG(`degrees', `int', `deg', `
+    if (val % 90 == 0)
+        return true;
+    sserror("invalid degrees: %", val);
+    return false;
+')dnl
+ROBINS_ARG(`blocks', `int', `mtr', `
+    (void) val;
     return true;
-}
-
-bool arg_sv_blocks(int value)
-{
-    (void)value;
-    return true;
-}')dnl
+')dnl
 dnl
-define(`ROBINS_ARG_SV_CASES',
-       `case ARG_DEGREES:
-            return arg_sv_degrees(evaluated_arg->val.ival);
-        case ARG_BLOCKS:
-            return arg_sv_blocks(evaluated_arg->val.ival);')dnl
+dnl definitions of instructions.
+dnl
+dnl ROBINS_INS(`mnemonic', `verb', `argument'...)
+dnl mnemonic: mnemonic for compiled instruction and identifier,
+dnl           must be a valid C variable name (otherwise undefined behaviour).
+dnl verb: word token for this instructions.
+dnl argument: argument of instruction.
+dnl
+ROBINS_INS(`mov', `move', `blocks')dnl
+ROBINS_INS(`rot', `rotate', `degrees')dnl
