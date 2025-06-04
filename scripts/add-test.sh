@@ -1,22 +1,29 @@
 #!/bin/bash
 
 set -euo pipefail
-trap 'echo "failed:$LINENO \"$BASH_COMMAND\""' ERR
 
 usage() {
-    echo "Usage: $0 <tests_dir> <testname>"
-    echo
-    echo "Arguments:"
-    echo "  <tests_dir>   Directory containing test input/output files"
-    echo "  <testname>    Test name to create"
-    echo
-    echo "Returns: succesfull creation"
-    echo
-    echo "Creates a new test in test_dir/<testname>"
-    echo
-    echo "Example:"
-    echo "  $0 arithmetic"
+    cat <<EOF
+Usage: add-test.sh <testname>
+
+Arguments:
+  <testname>    Test name to create
+
+Creates a new test in tests/<testname>
+Each test consists of a directory test/ with:
+  - args:       file binary containing positional arguments.
+  - config:     robins config file.
+  - input:      input file passed to the binary by path.
+  - expected:   file with the expected result.
+  - output:     generated file with the output of the last
+                test execution.
+EOF
 }
+
+[[ $# -ne 1 ]] && {
+    usage >&2
+    exit 1
+} >&2
 
 case "$1" in
     -h|--help)
@@ -25,15 +32,27 @@ case "$1" in
         ;;
 esac
 
-if [ $# -ne 2 ]; then
-    usage
+script_dir="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$script_dir" || {
+    echo "Error: unable to enter script parent parent directory"
+    echo "Error: dir: $script_dir"
     exit 1
-fi
+} >&2
 
-tests_dir="$1"
-testname="$2"
+default_config_dir="config"
+tests_dir="tests"
+mkdir -p "$tests_dir"
 
-mkdir -p "$tests_dir/$testname"
-touch  "$tests_dir/$testname/input" "$tests_dir/$testname/expected"
+testname="$1"
+[ -d "$tests_dir/$testname" ] && {
+    echo "test already exists"
+    exit 1
+} >&2
 
-echo "Created $testname in '$tests_dir/$testname'"
+mkdir "$tests_dir/$testname"
+touch "$tests_dir/$testname/args"
+touch "$tests_dir/$testname/input"
+touch "$tests_dir/$testname/expected"
+cp "$default_config_dir/config.m4" "$tests_dir/$testname/"
+
+echo "Created $testname in '$tests_dir/$testname'" >&2

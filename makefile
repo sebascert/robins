@@ -1,7 +1,6 @@
 target  := robins
 
 args    ?=
-test    ?=
 
 # dirs
 src_dir        := src
@@ -9,7 +8,6 @@ include_dir    := include
 config_dir     ?= config
 m4_include_dir := macros
 build_dir      := build
-tests_dir      := tests
 scripts_dir    := scripts
 
 # sources and headers
@@ -70,15 +68,8 @@ $(target): $(build_dir)/$(target)
 .PHONY: all $(target)
 
 # utils rules
-test: $(target)
-	@./$(scripts_dir)/test.sh "$(realpath $(build_dir)/$(target))" "$(realpath $(tests_dir))"
-
-add-test:
-ifeq ($(strip $(test)),)
-	@echo "missing test=<test>"
-else
-	@./$(scripts_dir)/add-test.sh "$(realpath $(tests_dir))" "$(test)"
-endif
+test:
+	@./$(scripts_dir)/test.sh
 
 format: $(headers) $(sources)
 	@clang-format -i $(headers) $(sources)
@@ -89,7 +80,7 @@ lint: $(CLANGDB) $(headers) $(sources)
 clangdb: clean-clangdb
 	@$(MAKE) $(CLANGDB)
 
-.PHONY: test add-test format lint clangdb
+.PHONY: test format lint clangdb
 
 # compilation rules
 $(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
