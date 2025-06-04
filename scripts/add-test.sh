@@ -11,12 +11,27 @@ Arguments:
 
 Creates a new test in tests/<testname>
 Each test consists of a directory test/ with:
-  - args:       file binary containing positional arguments.
-  - config:     robins config file.
-  - input:      input file passed to the binary by path.
-  - expected:   file with the expected result.
-  - output:     generated file with the output of the last
-                test execution.
+  - run.sh:     Shell script with the execution of the test
+                defaults to executing with input and writes
+                to output.
+  - config:     Robins config file, defaults to
+                config/config.m4.
+  - input:      Input file passed to the binary by path.
+  - output:     Generated file with the output of the last
+                test execution (if used by run.sh).
+  - expected:   File with the expected result.
+
+<testname>/run.sh is sourced from test.sh, if the script
+returns non zero code the test is marked as failed and the
+output and expected files are not compared. The following
+environment variables are provided to run.sh:
+  - test_bin:   Path to the binary of the
+  - test_dir:   Path to test dir.
+  - test_in:    Path to test input file.
+  - test_out:   Path to output file to be compared with
+                expected, this file is emptied prior to the
+                execution of run.sh. Unless expected is
+                missing, it will still be compared to it.
 EOF
 }
 
@@ -50,9 +65,11 @@ testname="$1"
 } >&2
 
 mkdir "$tests_dir/$testname"
-touch "$tests_dir/$testname/args"
+cat <<'EOF' > "$tests_dir/$testname/run.sh"
+./$test_bin "$test_in" --output="$test_out" 2>/dev/null
+EOF
+cp "$default_config_dir/config.m4" "$tests_dir/$testname/"
 touch "$tests_dir/$testname/input"
 touch "$tests_dir/$testname/expected"
-cp "$default_config_dir/config.m4" "$tests_dir/$testname/"
 
 echo "Created $testname in '$tests_dir/$testname'" >&2

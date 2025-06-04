@@ -29,7 +29,6 @@ cd "$script_dir" || {
     exit 1
 } >&2
 
-binary=build/robins
 tests_dir=tests
 
 { [ ! -d "$tests_dir" ] || [ -z "$(ls -A "$tests_dir")" ]; } && {
@@ -60,40 +59,46 @@ failed=0
 for testname in "${tests[@]}"; do
     test_dir="$tests_dir/$testname"
 
-    test_input="$test_dir/input"
+    test_bin=build/robins
+    test_run="$test_dir/run.sh"
+    test_in="$test_dir/input"
+    test_out="$test_dir/output"
     test_expected="$test_dir/expected"
 
-    [ ! -f "$test_dir/config.m4" ] || {
-        echo "Skipping $testname: missing robins config file"
+    [ ! -f "$test_run" ] && {
+        echo "Skipping: $testname: missing run.sh script"
         continue
     } >&2
-    [ ! -f "$test_input" ] || {
-        echo "Skipping $testname: missing input file"
-        continue
-    } >&2
-    [ ! -f "$test_expected" ]|| {
-        echo "Skipping $testname: missing expected file"
+    [ ! -f "$test_dir/config.m4" ] && {
+        echo "Skipping: $testname: missing robins config.m4 file"
         continue
     } >&2
 
-    test_output="$test_dir/output"
-    test_args=$(cat "$test_dir/args" 2>/dev/null || true)
+    make config_dir="$test_dir" >&2
 
-    make config_dir="$test_dir"
+    echo -e "TEST $testname:\n" >&2
 
-    echo -n "Test $testname: "
+    source "$test_run" || {
+        echo "Test $testname FAILED: run.sh exited with non-zero status"
+        continue
+    } >&2
 
-    # execute binary and discard control output
-    $binary $test_args "$test_input" "--output=$test_output" 2>/dev/null
+    [ ! -r "$test_expected" ] && {
+        echo "TEST $testname PASSED"
+        continue
+    } >&2
 
-    if diff=$(diff -y "$test_expected" "$test_output"); then
-        echo "PASSED"
+    if diff=$(diff --side-by-side <(nl "$test_expected") <(nl "$test_out")); then
+        echo "TEST $testname PASSED" >&2
     else
-        echo "FAILED"
-        echo "  DIFF:"
-        input=$(grep -v '^//' <"$test_input")
-        lines=$(echo "$input" | wc -l)
-        paste <(seq 1 "$lines") <(echo "$input") <(echo "$diff") | column -s $'\t' -t
+        {
+            echo "TEST $testname FAILED: output differs from expected"
+            echo "  DIFF: $test_in - $test_out"
+            echo "$diff"
+            # input=$(grep -v '^//' <"$test_in")
+            # lines=$(echo "$input" | wc -l)
+            # paste <(seq 1 "$lines") <(echo "$input") <(echo "$diff") | column -s $'\t' -t
+        } >&2
 
         failed=$((failed+1))
     fi
