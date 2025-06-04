@@ -1,0 +1,39 @@
+robot please move 4 mtr.
+
+Robot rotate 180 deg.
+
+robot please rotate 180 deg, then move 10 mtr.
+
+Robot move 12 mtr, then rotate 0 deg.
+
+robot please move 3 mtr.
+
+Robot rotate 90 deg.
+
+robot move 7 mtr, then rotate 90 deg.
+
+robot please rotate 270 deg, then move 5 mtr.
+
+robot please move (3 + 2) mtr.
+
+Robot rotate (360 / 2) deg.
+
+robot please rotate (90 + 90) deg, then move (8 * 1) mtr.
+
+Robot move (6 * 2) mtr, then rotate (180 - 90) deg.
+
+robot please move (10 - 3) mtr.
+
+Robot rotate (45 * 2) deg.
+
+robot move (5 + 5 + 2) mtr, then rotate (360 / 4) deg.
+
+robot please rotate (720 / 2) deg, then move (3 * (2 + 1)) mtr.
+
+Robot move ((3 + 3) * 2) mtr.
+
+robot rotate ((90 + 90) - 45)*2 deg.
+
+robot please move (10 / 2 + 6) mtr, then rotate (360 - 180) deg.
+
+Robot rotate (3 * 30) deg, then move (100 / 10) mtr.

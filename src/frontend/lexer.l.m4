@@ -1,12 +1,4 @@
 include(`config.m4')dnl
-ifdef(`ROBINS_NOUN_LEXEMAS', , `errprint(`m4: ERROR: ROBINS_NOUN_LEXEMAS is not defined.')
-m4exit(1)')dnl
-ifdef(`ROBINS_POLITE_WORDS_LEXEMAS', , `errprint(`m4: ERROR: ROBINS_POLITE_WORDS_LEXEMAS is not defined.')
-m4exit(1)')dnl
-ifdef(`ROBINS_INS_VERB_LEXEMAS', , `errprint(`m4: ERROR: ROBINS_INS_VERB_LEXEMAS is not defined.')
-m4exit(1)')dnl
-ifdef(`ROBINS_ARG_UNIT_LEXEMAS', , `errprint(`m4: ERROR: ROBINS_ARG_UNIT_LEXEMAS is not defined.')
-m4exit(1)')dnl
 %{
 #include "ast/node.h"
 #include "frontend/yyshared.h"

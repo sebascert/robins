@@ -69,3 +69,7 @@ dnl argument: argument of instruction.
 dnl
 ROBINS_INS(`mov', `move', `blocks')dnl
 ROBINS_INS(`rot', `rotate', `degrees')dnl
+dnl
+dnl DO NOT REMOVE.
+dnl Asserts that the given configuration is valid.
+include(`defs/assert.m4')dnl

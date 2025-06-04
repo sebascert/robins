@@ -34,7 +34,7 @@ void free_node(struct astnode *node)
             free(node);
             break;
         case ASTNODE_T_ARGUMENT:
-            free(node->arg.resolution);
+            free_node(node->arg.resolution);
             free(node);
             break;
         case ASTNODE_T_OPERATION:

@@ -64,14 +64,8 @@ make clean
 
 ## Tests
 
-run test suite:
+Run entire test suite:
 
 ```bash
 make test
-```
-
-add test:
-
-```bash
-make add-test test=<test>
 ```
