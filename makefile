@@ -6,6 +6,7 @@ test    ?=
 # dirs
 src_dir        := src
 include_dir    := include
+config_dir     ?= config
 m4_include_dir := macros
 build_dir      := build
 tests_dir      := tests
@@ -48,7 +49,7 @@ endif
 
 # m4 setup
 M4          := m4
-M4FLAGS     := -I$(m4_include_dir)
+M4FLAGS     := -I$(m4_include_dir) -I$(config_dir)
 
 # lex and yacc flags
 LEX             := flex
