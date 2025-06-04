@@ -40,7 +40,7 @@ CSTD        := c99
 CLINK       := -lfl -ly
 CFLAGS      := -Wall -Wextra -std=$(CSTD) -I$(include_dir)
 ifeq ($(BUILD),release)
-	target += _release
+	target := robins_release
 	CFLAGS += -O2
 else
 	CFLAGS += -g
@@ -92,15 +92,18 @@ clangdb: clean-clangdb
 
 # compilation rules
 $(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
-	$(CC) $(CFLAGS) $(CLINK) $^ -o $@
+	@$(CC) $(CFLAGS) $(CLINK) $^ -o $@
+	@echo "compiled to: $@"
 
 %.o: %.c | $(headers)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
 $(lex_c): $(lexer) $(yacc_h)
-	$(LEX) $(LEXFLAGS) --outfile="$(lex_c)" -- $(lexer)
+	@$(LEX) $(LEXFLAGS) --outfile="$(lex_c)" -- $(lexer)
+	@echo "compiled lexical analyzer"
 $(yacc_c) $(yacc_h): $(parser)
-	$(YACC) $(YACCFLAGS) --output="$(yacc_c)" --header="$(yacc_h)" -- $(parser)
+	@$(YACC) $(YACCFLAGS) --output="$(yacc_c)" --header="$(yacc_h)" -- $(parser)
+	@echo "compiled syntactical analyzer"
 
 $(lexyacc_objs): %.o: %.c
 	@$(CC) $(LEXYACC_CFLAGS) -c $< -o $@
@@ -115,16 +118,16 @@ $(build_dir):
 # m4 macro processing
 
 %.c: %.c.m4 $(m4_macros)
-	$(M4) $(M4FLAGS) $< > $@
+	@$(M4) $(M4FLAGS) $< > $@
 
 %.h: %.h.m4 $(m4_macros)
-	$(M4) $(M4FLAGS) $< > $@
+	@$(M4) $(M4FLAGS) $< > $@
 
 %.l: %.l.m4 $(m4_macros)
-	$(M4) $(M4FLAGS) $< > $@
+	@$(M4) $(M4FLAGS) $< > $@
 
 %.y: %.y.m4 $(m4_macros)
-	$(M4) $(M4FLAGS) $< > $@
+	@$(M4) $(M4FLAGS) $< > $@
 
 # clean rules
 clean:
