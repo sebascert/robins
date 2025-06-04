@@ -19,6 +19,7 @@ yacc_h              := $(parser:.y=.h)
 lexyacc_sources     := $(lex_c) $(yacc_c)
 lexyacc_genfiles    := $(lexyacc_sources) $(yacc_h)
 
+config      := $(config_dir)/config.m4
 m4_macros   := $(shell find $(m4_include_dir) -name '*.m4')
 m4_sources  := $(patsubst %.c.m4, %.c, $(shell find $(src_dir) -name '*.c.m4'))
 m4_headers  := $(patsubst %.h.m4, %.h, $(shell find $(include_dir) -name '*.h.m4'))
@@ -92,10 +93,8 @@ $(build_dir)/$(target): $(objs) $(lexyacc_objs) | $(build_dir)
 
 $(lex_c): $(lexer) $(yacc_h)
 	@$(LEX) $(LEXFLAGS) --outfile="$(lex_c)" -- $(lexer)
-	@echo "compiled lexical analyzer"
 $(yacc_c) $(yacc_h): $(parser)
 	@$(YACC) $(YACCFLAGS) --output="$(yacc_c)" --header="$(yacc_h)" -- $(parser)
-	@echo "compiled syntactical analyzer"
 
 $(lexyacc_objs): %.o: %.c
 	@$(CC) $(LEXYACC_CFLAGS) -c $< -o $@
@@ -109,16 +108,16 @@ $(build_dir):
 
 # m4 macro processing
 
-%.c: %.c.m4 $(m4_macros)
+%.c: %.c.m4 $(m4_macros) $(config)
 	@$(M4) $(M4FLAGS) $< > $@
 
-%.h: %.h.m4 $(m4_macros)
+%.h: %.h.m4 $(m4_macros) $(config)
 	@$(M4) $(M4FLAGS) $< > $@
 
-%.l: %.l.m4 $(m4_macros)
+%.l: %.l.m4 $(m4_macros) $(config)
 	@$(M4) $(M4FLAGS) $< > $@
 
-%.y: %.y.m4 $(m4_macros)
+%.y: %.y.m4 $(m4_macros) $(config)
 	@$(M4) $(M4FLAGS) $< > $@
 
 # clean rules
