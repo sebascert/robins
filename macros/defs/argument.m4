@@ -1,6 +1,6 @@
-include(`utils/print.m4')dnl
-include(`utils/stack.m4')dnl
-include(`utils/capitalize.m4')dnl
+include(`utils/robins/print.m4')dnl
+include(`utils/gnu/stack.m4')dnl
+include(`utils/gnu/capitalize.m4')dnl
 dnl
 define(`ROBINS_ARG_GRAMMAR_MACROS_FORMATTING',
 `%token ARG_`'upcase($1)_UNIT

@@ -1,4 +1,4 @@
-include(`utils/stack.m4')dnl
+include(`utils/gnu/stack.m4')dnl
 dnl
 define(`ROBINS_NOUN_LEXEMA_FORMATTING',
 `"$1" { return NOUN; }
