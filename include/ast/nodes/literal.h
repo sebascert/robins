@@ -11,9 +11,12 @@ typedef enum {
     LITERAL_T_REAL,
 } literal_t;
 
+typedef int literal_t_int;
+typedef double literal_t_real;
+
 union literal_v {
-    int ival;
-    double rval;
+    literal_t_int ival;
+    literal_t_real rval;
 };
 
 struct literal {

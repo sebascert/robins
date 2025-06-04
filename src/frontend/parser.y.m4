@@ -1,3 +1,16 @@
+include(`config.m4')dnl
+ifdef(`ROBINS_INS_GRAMMAR_MACROS', , `errprint(`m4: ERROR: ROBINS_INS_GRAMMAR_MACROS is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_ARG_GRAMMAR_MACROS', , `errprint(`m4: ERROR: ROBINS_ARG_GRAMMAR_MACROS is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_INS_GRAMMAR_RULE_STRUCTURE', , `errprint(`m4: ERROR: ROBINS_INS_GRAMMAR_RULE_STRUCTURE is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_INS_PARTIAL_GRAMMAR_RULE', , `errprint(`m4: ERROR: ROBINS_INS_PARTIAL_GRAMMAR_RULE is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_INS_GRAMMAR_RULES', , `errprint(`m4: ERROR: ROBINS_INS_GRAMMAR_RULES is not defined.')
+m4exit(1)')dnl
+ifdef(`ROBINS_ARG_GRAMMAR_RULES', , `errprint(`m4: ERROR: ROBINS_ARG_GRAMMAR_RULES is not defined.')
+m4exit(1)')dnl
 %{
 #include "ast/node.h"
 #include "frontend/yyshared.h"
@@ -18,17 +31,11 @@
 %token INS_CONJUNCTION
 
 /* INSTRUCTION */
-%type <nptr> stmt ins any_ins
+%type <nptr> stmt ins partial_ins
 /* instruction tokens and type decl */
-%token INS_ROTATE_VERB /* macroized */
-%token INS_MOVE_VERB /* macroized */
-%type <nptr> ins_rotate /* macroized */
-%type <nptr> ins_move /* macroized */
+ROBINS_INS_GRAMMAR_MACROS()
 /* argument tokens and type decl */
-%token ARG_DEGREES_UNIT /* macroized */
-%token ARG_BLOCKS_UNIT /* macroized */
-%type <nptr> arg_degrees /* macroized */
-%type <nptr> arg_blocks /* macroized */
+ROBINS_ARG_GRAMMAR_MACROS()
 
 /* ARITHMETIC */
 /* literals */
@@ -57,30 +64,18 @@ stmt:
 ;
 
 /* instructions */
-ins: /* unpolite, polite, or both modes could be supported */
-    any_ins                     { $$ = $1; } /* macroized */
-|   POLITE_WORDS any_ins        { $$ = $2; } /* macroized */
+ins:
+ROBINS_INS_GRAMMAR_RULE_STRUCTURE()
 ;
 
-any_ins:
-    ins_rotate                  { $$ = $1; } /* macroized */
-|   ins_move                    { $$ = $1; } /* macroized */
+partial_ins:
+ROBINS_INS_PARTIAL_GRAMMAR_RULE()
 ;
 
-ins_rotate: /* macroized */
-    INS_ROTATE_VERB arg_degrees { $$ = push_ins(INS_ROTATE, 1, $2); }
-;
-ins_move: /* macroized */
-    INS_MOVE_VERB arg_blocks { $$ = push_ins(INS_MOVE, 1, $2); }
-;
+ROBINS_INS_GRAMMAR_RULES()
 
 /* arguments */
-arg_degrees: /* macroized */
-    num_expr ARG_DEGREES_UNIT   { $$ = push_arg(ARG_DEGREES, $1); }
-;
-arg_blocks: /* macroized */
-    num_expr ARG_BLOCKS_UNIT   { $$ = push_arg(ARG_BLOCKS, $1); }
-;
+ROBINS_ARG_GRAMMAR_RULES()
 
 /* arithmetic */
 num_expr:

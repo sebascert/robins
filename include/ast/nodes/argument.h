@@ -1,12 +1,7 @@
 #ifndef AST_NODES_ARGUMENT_H
 #define AST_NODES_ARGUMENT_H
 
-extern const char *const argument_t_names[];
-
-typedef enum {
-    ARG_DEGREES, /* macroized */
-    ARG_BLOCKS,  /* macroized */
-} argument_t;
+#include "ast/user_types.h"
 
 struct astnode;
 struct argument {

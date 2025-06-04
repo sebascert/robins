@@ -4,7 +4,7 @@
 
 const char *const literal_t_names[] = {
     [LITERAL_T_INT] = "int",
-    [LITERAL_T_REAL] = "float",
+    [LITERAL_T_REAL] = "double",
 };
 
 struct literal NULL_LITERAL = {
@@ -19,7 +19,7 @@ int print_lit(const struct literal *lit, FILE *fout)
             fprintf(fout, "%d", lit->val.ival);
             return 0;
         case LITERAL_T_REAL:
-            fprintf(fout, "%.2f", lit->val.rval);
+            fprintf(fout, "%.2lf", lit->val.rval);
             return 0;
         default:
             return 1;

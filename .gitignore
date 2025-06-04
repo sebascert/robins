@@ -14,6 +14,13 @@ lexer.c
 parser.c
 parser.h
 
+# m4 generated files
+/src/frontend/lexer.l
+/src/ast/user_types.c
+/src/frontend/parser.y
+/src/semantic/argument.c
+/include/ast/user_types.h
+
 # c
 *.o
 *.out
