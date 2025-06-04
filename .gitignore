@@ -8,8 +8,6 @@
 /tests/**/output
 
 # lex and yacc
-lexer.i
-parser.i
 lexer.c
 parser.c
 parser.h
