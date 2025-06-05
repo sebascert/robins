@@ -3,7 +3,7 @@ dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
 dnl
-include(`utils/quote.m4')dnl
+include(`utils/gnu/quote.m4')dnl
 divert(`-1')
 # foreachq(x, `item_1, item_2, ..., item_n', stmt)
 #   quoted list, simple version

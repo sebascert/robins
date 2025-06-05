@@ -71,11 +71,11 @@ ROBINS_ARG(`blocks', `int', `mtr', `
 dnl
 dnl definitions of instructions.
 dnl
-dnl ROBINS_INS(`mnemonic', `verb', `argument'...)
+dnl ROBINS_INS(`mnemonic', `verb', `arguments')
 dnl mnemonic: mnemonic for compiled instruction and identifier,
 dnl           must be a valid C variable name (otherwise undefined behaviour).
 dnl verb: word token for this instructions.
-dnl argument: argument of instruction.
+dnl arguments: list of arguments for the instruction (any length).
 dnl
 ROBINS_INS(`mov', `move', `blocks')dnl
 ROBINS_INS(`rot', `rotate', `degrees')dnl
