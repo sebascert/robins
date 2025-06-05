@@ -80,6 +80,7 @@ for testname in "${tests[@]}"; do
 
     source "$test_run" || {
         echo "Test $testname FAILED: run.sh exited with non-zero status"
+        failed=$((failed+1))
         continue
     } >&2
 
