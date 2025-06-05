@@ -32,6 +32,8 @@ dnl conjunction: string in between instructions.
 dnl
 ROBINS_CONJUNCTION(``,' then')dnl
 ROBINS_CONJUNCTION(``,' and then')dnl
+ROBINS_CONJUNCTION(``,' after that')dnl
+ROBINS_CONJUNCTION(``,' and after that')dnl
 dnl
 dnl Politeness level of the language recognized.
 dnl
@@ -41,7 +43,7 @@ dnl     (0) no polite words accepted.
 dnl     (1) both polite and not polite words accepted.
 dnl     (2) onlu polite words accepted.
 dnl
-ROBINS_POLITENESS_LEVEL(1)dnl
+ROBINS_POLITENESS_LEVEL(2)dnl
 dnl
 dnl Argument Definitions.
 dnl
@@ -58,15 +60,14 @@ dnl valid types:
 dnl - int: integer number, int C type.
 dnl - real: real number, double C type.
 dnl
-ROBINS_ARG(`degrees', `int', `deg', `
+ROBINS_ARG(`degrees', `int', `degrees', `
     if (val % 90 == 0)
         return true;
     sserror("invalid degrees: %", val);
     return false;
 ')dnl
-ROBINS_ARG(`blocks', `int', `mtr', `
-    (void) val;
-    return true;
+ROBINS_ARG(`blocks', `int', `blocks', `
+    return val >= 0;
 ')dnl
 dnl
 dnl definitions of instructions.
