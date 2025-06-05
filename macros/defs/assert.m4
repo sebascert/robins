@@ -1,6 +1,9 @@
 dnl ROBINS_NOUN
 ifdef(`ROBINS_NOUN_STACK', , `errprint(`m4: ERROR: no ROBINS_NOUN configured.')
 m4exit(1)')dnl
+dnl ROBINS_CONJUNCTION
+ifdef(`ROBINS_CONJUNCTION_STACK', , `errprint(`m4: ERROR: no ROBINS_CONJUNCTION configured.')
+m4exit(1)')dnl
 dnl ROBINS_POLITENESS_LEVEL
 ifdef(`ROBINS_POLITE_WORDS_LEXEMAS', , `errprint(`m4: ERROR: no ROBINS_POLITENESS_LEVEL configured.')
 m4exit(1)')dnl

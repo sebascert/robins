@@ -10,6 +10,7 @@ dnl
 dnl DO NOT REMOVE.
 dnl Includes for macro definitions.
 include(`defs/noun.m4')dnl
+include(`defs/conjunction.m4')dnl
 include(`defs/politeness_level.m4')dnl
 include(`defs/instruction.m4')dnl
 include(`defs/argument.m4')dnl
@@ -22,6 +23,15 @@ dnl nouns: string of noun.
 dnl
 ROBINS_NOUN(`robot')dnl
 ROBINS_NOUN(`Robot')dnl
+dnl
+dnl Instruction conjunctions, to join multiple instructions in a single
+dnl statement. Strings registered as conjunctions become reserved.
+dnl dnl
+dnl ROBINS_CONJUNCTION(`cojunction')
+dnl conjunction: string in between instructions.
+dnl
+ROBINS_CONJUNCTION(``,' then')dnl
+ROBINS_CONJUNCTION(``,' and then')dnl
 dnl
 dnl Politeness level of the language recognized.
 dnl
