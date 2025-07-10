@@ -10,6 +10,7 @@ dnl
 dnl DO NOT REMOVE.
 dnl Includes for macro definitions.
 include(`defs/noun.m4')dnl
+include(`defs/conjunction.m4')dnl
 include(`defs/politeness_level.m4')dnl
 include(`defs/instruction.m4')dnl
 include(`defs/argument.m4')dnl
@@ -22,6 +23,15 @@ dnl nouns: string of noun.
 dnl
 ROBINS_NOUN(`robot')dnl
 ROBINS_NOUN(`Robot')dnl
+dnl
+dnl Instruction conjunctions, to join multiple instructions in a single
+dnl statement. Strings registered as conjunctions become reserved.
+dnl dnl
+dnl ROBINS_CONJUNCTION(`cojunction')
+dnl conjunction: string in between instructions.
+dnl
+ROBINS_CONJUNCTION(``,' then')dnl
+ROBINS_CONJUNCTION(``,' and then')dnl
 dnl
 dnl Politeness level of the language recognized.
 dnl
@@ -61,11 +71,11 @@ ROBINS_ARG(`blocks', `int', `mtr', `
 dnl
 dnl definitions of instructions.
 dnl
-dnl ROBINS_INS(`mnemonic', `verb', `argument'...)
+dnl ROBINS_INS(`mnemonic', `verb', `arguments')
 dnl mnemonic: mnemonic for compiled instruction and identifier,
 dnl           must be a valid C variable name (otherwise undefined behaviour).
 dnl verb: word token for this instructions.
-dnl argument: argument of instruction.
+dnl arguments: list of arguments for the instruction (any length).
 dnl
 ROBINS_INS(`mov', `move', `blocks')dnl
 ROBINS_INS(`rot', `rotate', `degrees')dnl

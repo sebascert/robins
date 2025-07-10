@@ -20,8 +20,7 @@ ROBINS_NOUN_LEXEMAS()
     /* statement polite words */
 ROBINS_POLITE_WORDS_LEXEMAS()
     /* instruction conjunction (may get macroized later) */
-", and then"                    { return INS_CONJUNCTION; }
-", then"                        { return INS_CONJUNCTION; }
+ROBINS_CONJUNCTION_LEXEMAS()
     /* instruction verbs */
 ROBINS_INS_VERB_LEXEMAS()
     /* argument units */

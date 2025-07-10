@@ -5,6 +5,10 @@ commands. It is designed for lightweight applications that need to convert
 natural language into a more manageable, structured encoding. Both the natural
 language syntax and its mappings are configurable.
 
+> Full documentation is available in the
+> [robins wiki](https://github.com/sebascert/robins/wiki). For a quick start read the
+> next sections
+
 ## Dependencies
 
 - **GNU M4 v1.4.x**
@@ -12,14 +16,14 @@ language syntax and its mappings are configurable.
 - **flex v2.x**
 - **bison v3.x**
 
-ROBINS uses `flex` for lexical analysis and `bison` for syntactical analysis,
-(in ubuntuthe library `libbison-dev` is required for linking `liby.a`). GNU M4
-is used to generate code for the user configured language.
+ROBINS uses `flex` for lexical analysis and `bison` for syntactical analysis.
+GNU M4 is used to generate code for the user configured language.
 
 Example installation on Ubuntu:
 
 ```bash
 sudo apt update
+# libbison-dev is required for linking liby.a
 sudo apt install flex bison libbison-dev m4
 ```
 
@@ -31,9 +35,10 @@ file.
 
 > [GNU M4 manual on M4 syntax](https://www.gnu.org/software/m4/manual/m4.html#Syntax)
 
-Read the [wiki](pending) for the full capabilities and limitations of languages
-parsed by ROBINS. The default config file contains a simple usage of ROBINS for
-the parsing of language with this instructions:
+Read the [wiki](https://github.com/sebascert/robins/wiki/Configurations) for
+the full capabilities and limitations of languages parsed by ROBINS. The
+default config file contains a simple usage of ROBINS for the parsing of
+language with this instructions:
 
 ```
 // may have have robot capitalized or not
