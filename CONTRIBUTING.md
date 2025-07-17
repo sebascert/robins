@@ -36,6 +36,7 @@ Project file structure:
 - [valgrind](https://valgrind.org/)
 - [clang-tidy](https://clang.llvm.org/extra/clang-tidy/)
 - [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
+- [graphviz](https://graphviz.org/) (only for rendering the AST)
 
 ## Tests
 
