@@ -30,7 +30,7 @@ dnl Arguments
 ROBINS_ARG(`degrees', `int', `deg', `
     if (val % 90 == 0)
         return true;
-    sserror("invalid degrees: %", val);
+    sserror("invalid degrees: %d", val);
     return false;
 ')dnl
 ROBINS_ARG(`blocks', `int', `mtr', `
