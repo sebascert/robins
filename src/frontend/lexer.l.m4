@@ -37,10 +37,10 @@ ROBINS_ARG_UNIT_LEXEMAS()
 
  /* LEXICAL IGNORES */
     /* ignore comments */
-\/\/.*                          { yylineno++; }
+\/\/.*                          ;
     /* ignore whitespace */
 \n                              { yylineno++; }
-[ \t]                         ;
+[ \t]                           ;
 
  /* LEXICAL ERROR */
 .  {
