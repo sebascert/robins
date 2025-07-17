@@ -6,7 +6,7 @@ const literal_t arg_types[] = {
     ROBINS_ARG_TYPE_MAP()
 };
 
-/* argument semantic validators */
+// argument semantic validators
 ROBINS_ARG_SV_DECL()
 
 bool user_arg_sv(argument_t type, struct literal* evaluated_arg)

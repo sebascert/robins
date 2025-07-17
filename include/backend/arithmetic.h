@@ -6,7 +6,6 @@
 int cast_lit(struct literal *lit, literal_t cast);
 union literal_v literal_default(literal_t type);
 
-// arithmetic
 struct literal negate_lit(struct literal a);
 struct literal add_lit(struct literal a, struct literal b);
 struct literal sub_lit(struct literal a, struct literal b);

@@ -6,7 +6,7 @@
 
 #include <stdbool.h>
 
-/* argument semantic validation */
+// argument semantic validation
 bool arg_semantic_validate(argument_t type, struct literal* evaluated_arg);
 
 #endif /* ifndef SEMANTIC_ANALYZER_H */

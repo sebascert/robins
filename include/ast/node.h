@@ -32,8 +32,10 @@ struct astnode {
 
 void free_node(struct astnode *node);
 
-// the parser validate nodes which requires multiple args, as if the grammar is
-// correct, no incorrect or unexpected situation should arise
+// child nodes are not validated on node creation, as if the grammar is
+// correct, no incorrect or unexpected situation should arise from the node
+// creation usage. Still the AST walkers check for invalid cases in the AST for
+// debugging.
 
 struct astnode *push_stmt(struct astnode *first_ins);
 struct astnode *stmt_append_ins(struct astnode *stmt, struct astnode *ins);

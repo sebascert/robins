@@ -1,4 +1,4 @@
-#include "semantic/analyzer.h"
+#include "semantic/validator.h"
 
 #include "backend/arithmetic.h"
 #include "semantic/argument.h"

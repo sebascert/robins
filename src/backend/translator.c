@@ -2,7 +2,7 @@
 
 #include "ast/node.h"
 #include "backend/expr_eval.h"
-#include "semantic/analyzer.h"
+#include "semantic/validator.h"
 
 #include <stdio.h>
 
