@@ -5,12 +5,14 @@ instructions. It is intended for lightweight conversion of this subset of
 natural language into a more manageable, structured encoding. ROBINS is
 configurable, allowing customization of both its syntax and translation output.
 
-<span style="color: #D27FA6;">Robot</span> <span style="color: #9CCBA8;">would
-you please</span> <span style="color: #F3D56E;">move</span>
-<span style="color: #9AB3E1;">8 / 2 meters</span><span style="color: #9CCBA8;">,
-and then</span> <span style="color: #F3D56E;">rotate</span>
-<span style="color: #9AB3E1;">90\*5
-degrees</span><span style="color: #D27FA6;">.</span>
+${\color{#D27FA6}Robot \space}
+{\color{#9CCBA8}would \space you \space please \space}
+{\color{#F3D56E}move \space}
+{\color{#9AB3E1}8 / 2 \space meters}
+{\color{#9CCBA8}, \space and \space then \space}
+{\color{#F3D56E}rotate \space}
+{\color{#9AB3E1}90\*5 \space degrees}
+{\color{#D27FA6}.}$
 
 ```
 mov 4
