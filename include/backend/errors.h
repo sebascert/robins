@@ -1,0 +1,8 @@
+#ifndef BACKEND_ERROR_H
+#define BACKEND_ERROR_H
+
+#define SEMANTIC_ERROR 1
+#define ARITHMETIC_ERROR 2
+#define INVALID_AST_ERROR 3
+
+#endif /* ifndef BACKEND_ERROR_H */

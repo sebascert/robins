@@ -1,20 +1,30 @@
 # ROBINS (Robot Instruction Compiler)
 
-ROBINS compiles natural language imperative instructions into assembly-like
-commands. It is designed for lightweight applications that need to convert
-natural language into a more manageable, structured encoding. Both the natural
-language syntax and its mappings are configurable.
+ROBINS translates natural language imperative commands into assembly-like
+instructions. It is intended for lightweight conversion of this subset of
+natural language into a more manageable, structured encoding. ROBINS is
+configurable, allowing customization of both its syntax and translation output.
 
-> Full documentation is available in the
-> [robins wiki](https://github.com/sebascert/robins/wiki). For a quick start read the
-> next sections
+${\color{#D27FA6}Robot \space}
+{\color{#9CCBA8}would \space you \space please \space}
+{\color{#F3D56E}move \space}
+{\color{#9AB3E1}8 / 2 \space meters}
+{\color{#9CCBA8}, \space and \space then \space}
+{\color{#F3D56E}rotate \space}
+{\color{#9AB3E1}90\*5 \space degrees}
+{\color{#D27FA6}.}$
+
+```
+mov 4
+rot 450
+```
 
 ## Dependencies
 
-- **GNU M4 v1.4.x**
-- **argp**
-- **flex v2.x**
-- **bison v3.x**
+- [GNU M4](https://www.gnu.org/software/m4/) v1.4.x
+- [argp](https://www.gnu.org/software/libc/manual/html_node/Argp.html)
+- [Flex](https://github.com/westes/flex) v2.x
+- [Bison](https://www.gnu.org/software/bison/) v3.x
 
 ROBINS uses `flex` for lexical analysis and `bison` for syntactical analysis.
 GNU M4 is used to generate code for the user configured language.
@@ -22,55 +32,50 @@ GNU M4 is used to generate code for the user configured language.
 Example installation on Ubuntu:
 
 ```bash
-sudo apt update
+apt update
 # libbison-dev is required for linking liby.a
-sudo apt install flex bison libbison-dev m4
+apt install flex bison libbison-dev m4
 ```
 
 ## Usage
 
-Configure the language parsed by ROBINS in `macros/config.m4`, each
+Configure the language parsed by ROBINS in `config/config.m4`, each
 configuration option contains documentation on it's usage in the default config
 file.
 
-> [GNU M4 manual on M4 syntax](https://www.gnu.org/software/m4/manual/m4.html#Syntax)
+> While the M4 used the configuration is minimal, you can refer to the
+> [GNU guide on M4 syntax](https://www.gnu.org/software/m4/manual/m4.html#Syntax)
+> if you need help or want to explore more features.
 
-Read the [wiki](https://github.com/sebascert/robins/wiki/Configurations) for
-the full capabilities and limitations of languages parsed by ROBINS. The
-default config file contains a simple usage of ROBINS for the parsing of
-language with this instructions:
-
-```
-// may have have robot capitalized or not
-// instructions may have polite words preceding them or not
-robot please move 4 mtr.
-Robot rotate 180 deg.
-robot please rotate 180 deg, then move 10 mtr.
-Robot move 12 mtr, then rotate 0 deg.
-```
-
-After installing the [dependencies](#dependencies), compile ROBINS with:
+Read the [wiki](https://github.com/sebascert/robins/wiki/Configurations) for the
+full capabilities and limitations of languages parsed by ROBINS. The default
+config file contains a simple usage of ROBINS for the parsing of a language with
+this instructions:
 
 ```bash
-make # compiled to build/robins
+make
 ```
 
-Run the `--help` flag for the available command line options:
+Run the `--help` flag to list the available command line options:
 
 ```bash
 ./build/robins --help
 ```
 
-clean compiled and temp files:
+ROBINS test:
 
 ```bash
-make clean
+./build/robins -i <<EOF
+// Instructions may have have robot capitalized or not
+robot please move 4 mtr.
+Robot rotate 180 deg.
+// Instructions may have polite words preceding them or not
+robot please rotate 180 deg, then move 10 mtr.
+// Degrees must be a multiple of 90
+Robot rotate 89 deg.
+EOF
 ```
 
-## Tests
+## Contributing
 
-Run entire test suite:
-
-```bash
-make test
-```
+Please read the [contributing guide](/CONTRIBUTING.md) in order to do so.

@@ -5,7 +5,7 @@
 
 #include <stdbool.h>
 
-// translate AST to target
-struct literal expr_eval(const struct astnode *expr);
+// evaluate expression in AST
+int expr_eval(const struct astnode *node, struct literal *result);
 
 #endif /* ifndef BACKEND_EXPR_EVAL_H */

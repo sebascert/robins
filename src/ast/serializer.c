@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define INVALID_AST (size_t) - 1
+
 static size_t curr_id[] = {
     [ASTNODE_T_STATEMENT] = 0, [ASTNODE_T_INSTRUCTION] = 0,
     [ASTNODE_T_ARGUMENT] = 0,  [ASTNODE_T_OPERATION] = 0,
@@ -13,10 +15,11 @@ static size_t curr_id[] = {
 };
 
 // returns the id of the serialized node
+// on an INVALID_AST error the serializer aborts
 size_t serialize_ast_nodes(const struct astnode *node, FILE *fout)
 {
     if (!node)
-        return (size_t)-1;
+        return INVALID_AST;
 
     const char *label;
     size_t node_id;
@@ -29,7 +32,7 @@ size_t serialize_ast_nodes(const struct astnode *node, FILE *fout)
                 struct astnode *instruction = node->stmt.instructions[i];
                 size_t instruction_node_id =
                     serialize_ast_nodes(instruction, fout);
-                if (instruction_node_id == (size_t)-1)
+                if (instruction_node_id == INVALID_AST)
                     goto invalid_ast;
 
                 fprintf(fout, "_%s%lu -> _%s%lu\n",
@@ -45,7 +48,7 @@ size_t serialize_ast_nodes(const struct astnode *node, FILE *fout)
             for (size_t i = 0; i < node->ins.n_args; i++) {
                 struct astnode *arg = node->ins.args[i];
                 size_t arg_node_id = serialize_ast_nodes(arg, fout);
-                if (arg_node_id == (size_t)-1)
+                if (arg_node_id == INVALID_AST)
                     goto invalid_ast;
 
                 fprintf(fout, "_%s%lu -> _%s%lu\n",
@@ -60,7 +63,7 @@ size_t serialize_ast_nodes(const struct astnode *node, FILE *fout)
 
             struct astnode *resolution = node->arg.resolution;
             size_t resolution_node_id = serialize_ast_nodes(resolution, fout);
-            if (resolution_node_id == (size_t)-1)
+            if (resolution_node_id == INVALID_AST)
                 goto invalid_ast;
 
             fprintf(fout, "_%s%lu -> _%s%lu\n",
@@ -74,7 +77,7 @@ size_t serialize_ast_nodes(const struct astnode *node, FILE *fout)
             for (size_t i = 0; i < node->op.n_operands; i++) {
                 struct astnode *operand = node->op.operands[i];
                 size_t operand_node_id = serialize_ast_nodes(operand, fout);
-                if (operand_node_id == (size_t)-1)
+                if (operand_node_id == INVALID_AST)
                     goto invalid_ast;
 
                 fprintf(fout, "_%s%lu -> _%s%lu\n",
@@ -99,7 +102,7 @@ size_t serialize_ast_nodes(const struct astnode *node, FILE *fout)
             node_id, label);
     return node_id;
 invalid_ast:
-    return (size_t)-1;
+    return INVALID_AST;
 }
 
 FILE *serialize_ast_out;
@@ -111,7 +114,7 @@ void serialize_ast(const struct astnode *ast)
 
     fprintf(serialize_ast_out, "digraph Tree {\n");
 
-    if (serialize_ast_nodes(ast, serialize_ast_out) == (size_t)-1) {
+    if (serialize_ast_nodes(ast, serialize_ast_out) == INVALID_AST) {
         fprintf(stderr, "attempting to serialize invalid AST\n");
         return;
     }
