@@ -6,6 +6,6 @@
 #include <stdbool.h>
 
 // evaluate expression in AST
-struct literal expr_eval(const struct astnode *expr);
+int expr_eval(const struct astnode *node, struct literal *result);
 
 #endif /* ifndef BACKEND_EXPR_EVAL_H */
